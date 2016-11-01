@@ -29,7 +29,7 @@ Hope this helps others who are looking for a similar solution!
 
 If you download the source and plan to compile it, make sure to download the NuGet repository for the Google Apps Drive (v3) tools And MetroUI (this is free). This can be done by opening the NuGet manager in VS and typing in: "Install-Package Google.Apis.Drive.v3" (Without quotes), also search for Metro UI. There may be another step or two I'm forgetting, but feel free to ask and I'll be glad to help.
 
-Binary download is on the releases page (https://github.com/mtuckerinaz/Gapps-backup/releases)
+Binary download is on the releases page (https://github.com/mtucker6784/tto-googlebackup/releases)
 See http://www.tuckertechonline.com/ for instructions + screenshots
 
 Please understand that I know the code is very elementary, but it's enough to get the ball rolling.
