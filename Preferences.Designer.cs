@@ -37,6 +37,7 @@
             this.stripLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.metroTabControl1 = new MetroFramework.Controls.MetroTabControl();
             this.tabSettings = new MetroFramework.Controls.MetroTabPage();
+            this.lblWhatsThis = new System.Windows.Forms.Label();
             this.txtDomainKey = new System.Windows.Forms.TextBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.lblKey = new System.Windows.Forms.Label();
@@ -62,7 +63,6 @@
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.tipBiggerThan = new System.Windows.Forms.ToolTip(this.components);
-            this.lblWhatsThis = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.metroTabControl1.SuspendLayout();
@@ -152,6 +152,17 @@
             this.tabSettings.VerticalScrollbarHighlightOnWheel = false;
             this.tabSettings.VerticalScrollbarSize = 10;
             // 
+            // lblWhatsThis
+            // 
+            this.lblWhatsThis.AutoSize = true;
+            this.lblWhatsThis.BackColor = System.Drawing.Color.Transparent;
+            this.lblWhatsThis.Location = new System.Drawing.Point(353, 138);
+            this.lblWhatsThis.Name = "lblWhatsThis";
+            this.lblWhatsThis.Size = new System.Drawing.Size(65, 13);
+            this.lblWhatsThis.TabIndex = 31;
+            this.lblWhatsThis.Text = "What\'s this?";
+            this.tipBiggerThan.SetToolTip(this.lblWhatsThis, resources.GetString("lblWhatsThis.ToolTip"));
+            // 
             // txtDomainKey
             // 
             this.txtDomainKey.Location = new System.Drawing.Point(185, 33);
@@ -204,6 +215,7 @@
             this.btnCancel.TabIndex = 29;
             this.btnCancel.Text = "&Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnCancel_Click);
             // 
             // lblReplaceDomain
             // 
@@ -460,17 +472,6 @@
             this.tipBiggerThan.ReshowDelay = 20;
             this.tipBiggerThan.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.tipBiggerThan.ToolTipTitle = "Advanced Info";
-            // 
-            // lblWhatsThis
-            // 
-            this.lblWhatsThis.AutoSize = true;
-            this.lblWhatsThis.BackColor = System.Drawing.Color.Transparent;
-            this.lblWhatsThis.Location = new System.Drawing.Point(353, 138);
-            this.lblWhatsThis.Name = "lblWhatsThis";
-            this.lblWhatsThis.Size = new System.Drawing.Size(65, 13);
-            this.lblWhatsThis.TabIndex = 31;
-            this.lblWhatsThis.Text = "What\'s this?";
-            this.tipBiggerThan.SetToolTip(this.lblWhatsThis, resources.GetString("lblWhatsThis.ToolTip"));
             // 
             // Preferences
             // 
