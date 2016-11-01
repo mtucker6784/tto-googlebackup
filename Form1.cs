@@ -425,8 +425,6 @@ namespace TuckerTech_GABackup_GUI
                                                                 statusStripLabel1.Text = (savelocation + fileName + ext);
 
                                                                 string dest1 = Path.Combine(savelocation, fileName + ext);
-                                                                dest1 = GetSafeFilename(dest1);
-                                                                
                                                                 var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                                                                 scrolltobtm();
                                                                 requestfileid.MediaDownloader.ProgressChanged +=
