@@ -150,6 +150,11 @@ namespace TuckerTech_GABackup_GUI
         {
             ConfigurationManager.RefreshSection("appSettings");
         }
+
+        private void btnCancel_Click(object sender, MouseEventArgs e)
+        {
+            this.Close();
+        }
     }
 }
 
