@@ -1,0 +1,6 @@
+E:\Programs\Google.Apis.Drive.v3\Src\Generated\Google.Apis.Drive.v3\NetStandard\bin\Debug\Google.Apis.Drive.v3.dll
+E:\Programs\Google.Apis.Drive.v3\Src\Generated\Google.Apis.Drive.v3\NetStandard\bin\Debug\Google.Apis.Drive.v3.pdb
+E:\Programs\Google.Apis.Drive.v3\Src\Generated\Google.Apis.Drive.v3\NetStandard\bin\Debug\Google.Apis.Drive.v3.xml
+E:\Programs\Google.Apis.Drive.v3\Src\Generated\Google.Apis.Drive.v3\NetStandard\obj\Debug\Google.Apis.Drive.v3.dll
+E:\Programs\Google.Apis.Drive.v3\Src\Generated\Google.Apis.Drive.v3\NetStandard\obj\Debug\Google.Apis.Drive.v3.pdb
+E:\Programs\Google.Apis.Drive.v3\Src\Generated\Google.Apis.Drive.v3\NetStandard\obj\Debug\Google.Apis.Drive.v3.csprojResolveAssemblyReference.cache
