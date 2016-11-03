@@ -137,8 +137,8 @@ namespace TuckerTech_GABackup_GUI
                                 {
                                     opts = new ParallelOptions { MaxDegreeOfParallelism = totalresource };
                                 }
+                                // foreach (ListViewItem name in lstBackupUsers.Items)
                                 var checkforfinished = Parallel.ForEach(lstBackupUsers.Items.Cast<ListViewItem>(), opts, name =>
-                               // foreach (ListViewItem name in lstBackupUsers.Items)
                                     {
                                     try
                                     {
