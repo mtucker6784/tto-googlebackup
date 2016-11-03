@@ -54,6 +54,8 @@
             this.txtSaveLocation = new System.Windows.Forms.TextBox();
             this.tabAdvanced = new MetroFramework.Controls.MetroTabPage();
             this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
+            this.txtProcessors = new MetroFramework.Controls.MetroTextBox();
+            this.lblMultithread = new MetroFramework.Controls.MetroLabel();
             this.btnSaveMB = new System.Windows.Forms.Button();
             this.metroLabel2 = new MetroFramework.Controls.MetroLabel();
             this.txtBiggerThan = new MetroFramework.Controls.MetroTextBox();
@@ -118,7 +120,7 @@
             this.metroTabControl1.Controls.Add(this.tabAdvanced);
             this.metroTabControl1.Location = new System.Drawing.Point(12, 27);
             this.metroTabControl1.Name = "metroTabControl1";
-            this.metroTabControl1.SelectedIndex = 0;
+            this.metroTabControl1.SelectedIndex = 1;
             this.metroTabControl1.Size = new System.Drawing.Size(527, 418);
             this.metroTabControl1.TabIndex = 19;
             this.metroTabControl1.UseSelectable = true;
@@ -325,6 +327,8 @@
             // metroPanel2
             // 
             this.metroPanel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.metroPanel2.Controls.Add(this.txtProcessors);
+            this.metroPanel2.Controls.Add(this.lblMultithread);
             this.metroPanel2.Controls.Add(this.btnSaveMB);
             this.metroPanel2.Controls.Add(this.metroLabel2);
             this.metroPanel2.Controls.Add(this.txtBiggerThan);
@@ -340,6 +344,50 @@
             this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
             this.metroPanel2.VerticalScrollbarSize = 10;
             // 
+            // txtProcessors
+            // 
+            this.txtProcessors.BackColor = System.Drawing.SystemColors.ControlLight;
+            // 
+            // 
+            // 
+            this.txtProcessors.CustomButton.Image = null;
+            this.txtProcessors.CustomButton.Location = new System.Drawing.Point(139, 1);
+            this.txtProcessors.CustomButton.Name = "";
+            this.txtProcessors.CustomButton.Size = new System.Drawing.Size(21, 21);
+            this.txtProcessors.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this.txtProcessors.CustomButton.TabIndex = 1;
+            this.txtProcessors.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.txtProcessors.CustomButton.UseSelectable = true;
+            this.txtProcessors.CustomButton.Visible = false;
+            this.txtProcessors.Lines = new string[0];
+            this.txtProcessors.Location = new System.Drawing.Point(292, 49);
+            this.txtProcessors.MaxLength = 32767;
+            this.txtProcessors.Name = "txtProcessors";
+            this.txtProcessors.PasswordChar = '\0';
+            this.txtProcessors.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.txtProcessors.SelectedText = "";
+            this.txtProcessors.SelectionLength = 0;
+            this.txtProcessors.SelectionStart = 0;
+            this.txtProcessors.ShortcutsEnabled = true;
+            this.txtProcessors.Size = new System.Drawing.Size(161, 23);
+            this.txtProcessors.TabIndex = 17;
+            this.tipBiggerThan.SetToolTip(this.txtProcessors, "I found some stability issues when I went above 30%\r\nSince this feature is new, I" +
+        "\'d recommend staying at 30% or below\r\n\r\nBut if you like to live dangerously, fee" +
+        "l free to go higher.");
+            this.txtProcessors.UseSelectable = true;
+            this.txtProcessors.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this.txtProcessors.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            // 
+            // lblMultithread
+            // 
+            this.lblMultithread.AutoSize = true;
+            this.lblMultithread.Location = new System.Drawing.Point(16, 49);
+            this.lblMultithread.Name = "lblMultithread";
+            this.lblMultithread.Size = new System.Drawing.Size(248, 19);
+            this.lblMultithread.TabIndex = 16;
+            this.lblMultithread.Text = "Use up to the following number of cores:";
+            this.tipBiggerThan.SetToolTip(this.lblMultithread, resources.GetString("lblMultithread.ToolTip"));
+            // 
             // btnSaveMB
             // 
             this.btnSaveMB.Location = new System.Drawing.Point(217, 116);
@@ -353,7 +401,7 @@
             // metroLabel2
             // 
             this.metroLabel2.AutoSize = true;
-            this.metroLabel2.Location = new System.Drawing.Point(345, 20);
+            this.metroLabel2.Location = new System.Drawing.Point(460, 16);
             this.metroLabel2.Name = "metroLabel2";
             this.metroLabel2.Size = new System.Drawing.Size(29, 19);
             this.metroLabel2.TabIndex = 4;
@@ -375,7 +423,7 @@
             this.txtBiggerThan.CustomButton.UseSelectable = true;
             this.txtBiggerThan.CustomButton.Visible = false;
             this.txtBiggerThan.Lines = new string[0];
-            this.txtBiggerThan.Location = new System.Drawing.Point(178, 16);
+            this.txtBiggerThan.Location = new System.Drawing.Point(292, 16);
             this.txtBiggerThan.MaxLength = 32767;
             this.txtBiggerThan.Name = "txtBiggerThan";
             this.txtBiggerThan.PasswordChar = '\0';
@@ -541,5 +589,7 @@
         private MetroFramework.Controls.MetroLabel metroLabel1;
         private System.Windows.Forms.ToolTip tipBiggerThan;
         private System.Windows.Forms.Label lblWhatsThis;
+        private MetroFramework.Controls.MetroTextBox txtProcessors;
+        private MetroFramework.Controls.MetroLabel lblMultithread;
     }
 }

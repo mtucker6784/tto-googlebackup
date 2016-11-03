@@ -8,7 +8,7 @@ using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
@@ -18,12 +18,12 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TuckerTech_GABackup_GUI
 {
 
-    //    public partial class Form1 : Syncfusion.Windows.Forms.Tools.RibbonForm
     public partial class Form1 : Form
     {
         // Google wanted me to define these.
@@ -34,7 +34,7 @@ namespace TuckerTech_GABackup_GUI
         {
             set
             {
-                this.btnSkipFile.Text = value;
+                this.txtLog.Text = value;
             }
         }
 
@@ -43,7 +43,7 @@ namespace TuckerTech_GABackup_GUI
         static string nothing2 = ("Nothing to new to save!\n" + Environment.NewLine);
         public Form1()
         {
-            
+
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
         }
@@ -130,8 +130,16 @@ namespace TuckerTech_GABackup_GUI
                             }
                             else
                             {
-                                foreach (ListViewItem name in lstBackupUsers.Items)
+                                int totalresource = int.Parse(ConfigurationManager.AppSettings["multithread"]);
+                                //var opts = new ParallelOptions { MaxDegreeOfParallelism = Convert.ToInt32(Math.Ceiling((Environment.ProcessorCount * totalresource) * 1.0)) };
+                                var opts = new ParallelOptions { MaxDegreeOfParallelism = 1 };
+                                if (Environment.Is64BitOperatingSystem == true) // x64, let's use all our set preference instead.
                                 {
+                                    opts = new ParallelOptions { MaxDegreeOfParallelism = totalresource };
+                                }
+                                var checkforfinished = Parallel.ForEach(lstBackupUsers.Items.Cast<ListViewItem>(), opts, name =>
+                               // foreach (ListViewItem name in lstBackupUsers.Items)
+                                    {
                                     try
                                     {
                                         string names = name.SubItems[0].Text;
@@ -140,12 +148,14 @@ namespace TuckerTech_GABackup_GUI
                                         arraycount++;
                                         stripLabel.Text = "";
                                         Console.WriteLine("Selecting user: " + names.ToString());
+                                        txtLog.Text += "Selecting user: " + names.ToString() + Environment.NewLine;
                                         txtCurrentUser.Text = names.ToString();
-                                        // Define parameters of request.
-                                        string user = names.ToString();
+                                         // Define parameters of request.
+                                         string user = names.ToString();
 
-                                        // Check if directory exists, create if not.
-                                        string savelocation = ConfigurationManager.AppSettings["savelocation"] + user + "\\";
+                                         // Check if directory exists, create if not.
+                                         string savelocation = ConfigurationManager.AppSettings["savelocation"] + user + "\\";
+
                                         if (File.Exists(savelocation + ".deltalog.tok"))
                                             File.Delete(savelocation + ".deltalog.tok");
                                         FileInfo testdir = new FileInfo(savelocation);
@@ -153,10 +163,10 @@ namespace TuckerTech_GABackup_GUI
                                         string savedStartPageToken = "";
                                         var start = CreateService.BuildService(user).Changes.GetStartPageToken().Execute();
 
-                                        // This token is set by Google, it defines changes made and
-                                        // increments the token value automatically. 
-                                        // The following reads the current token file (if it exists)
-                                        if (File.Exists(savelocation + ".currenttoken.tok"))
+                                         // This token is set by Google, it defines changes made and
+                                         // increments the token value automatically. 
+                                         // The following reads the current token file (if it exists)
+                                         if (File.Exists(savelocation + ".currenttoken.tok"))
                                         {
                                             StreamReader curtokenfile = new StreamReader(savelocation + ".currenttoken.tok");
                                             savedStartPageToken = curtokenfile.ReadLine().ToString();
@@ -164,11 +174,11 @@ namespace TuckerTech_GABackup_GUI
                                         }
                                         else
                                         {
-                                            // Token record didn't exist. Create a generic file, start at "1st" token
-                                            // In reality, I have no idea what token to start at, but 1 seems to be safe.
-                                            Console.Write("Creating new token file.\n");
-                                            //txtLog.Text += ("Creating new token file.\n" + Environment.NewLine);
-                                            StreamWriter sw = new StreamWriter(savelocation + ".currenttoken.tok");
+                                             // Token record didn't exist. Create a generic file, start at "1st" token
+                                             // In reality, I have no idea what token to start at, but 1 seems to be safe.
+                                             Console.Write("Creating new token file.\n");
+                                             //txtLog.Text += ("Creating new token file.\n" + Environment.NewLine);
+                                             StreamWriter sw = new StreamWriter(savelocation + ".currenttoken.tok");
                                             sw.Write(1);
                                             sw.Dispose();
                                             savedStartPageToken = "1";
@@ -178,47 +188,46 @@ namespace TuckerTech_GABackup_GUI
                                         int mytoken = int.Parse(savedStartPageToken);
                                         txtPrevToken.Text = pageToken.ToString();
                                         txtCurrentToken.Text = gtoken.ToString();
-
                                         if (gtoken <= 10)
                                         {
                                             Console.WriteLine("Nothing to save!\n");
-                                            //txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
-                                        }
+                                             //txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
+                                         }
                                         else
                                         {
                                             if (pageToken == start.StartPageTokenValue)
                                             {
                                                 Console.WriteLine("No file changes found for " + user + "\n");
-                                                //txtLog.Text += ("No file changes found! Please wait while I tidy up." + Environment.NewLine);
-                                            }
+                                                 //txtLog.Text += ("No file changes found! Please wait while I tidy up." + Environment.NewLine);
+                                             }
                                             else
                                             {
-                                                // .deltalog.tok is where we will place our records for changed files
-                                                Console.WriteLine("Changes detected. Making notes while we go through these.");
+                                                 // .deltalog.tok is where we will place our records for changed files
+                                                 Console.WriteLine("Changes detected. Making notes while we go through these.");
                                                 lblProgresslbl.Text = "Scanning Drive directory.";
 
-                                                // Damnit Google, why did you change how the change fields work?
-                                                if (savedStartPageToken == "1")
+                                                 // Damnit Google, why did you change how the change fields work?
+                                                 if (savedStartPageToken == "1")
                                                 {
                                                     statusStripLabel1.Text = "Recording folder list ...";
-                                                    btnSkipFile.Text = "Recording folder list ..." + Environment.NewLine;
+                                                    txtLog.Text = "Recording folder list ..." + Environment.NewLine;
                                                     exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
-                                                    statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!" ;
-                                                    btnSkipFile.Text += Environment.NewLine + "Recording new/changed list for: " + user;
+                                                    statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
+                                                    txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user;
                                                     exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
                                                 }
                                                 else
                                                 {
-                                                    //proUserclass = proUser;
-                                                    statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
-                                                    btnSkipFile.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
+                                                     //proUserclass = proUser;
+                                                     statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
+                                                    txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
                                                     exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
                                                 }
 
-                                                // Get all our files for the user. Max page size is 1k
-                                                // after that, we have to use Google's next page token
-                                                // to let us get more files.
-                                                StreamWriter logFile = new StreamWriter(savelocation + ".recent.log");
+                                                 // Get all our files for the user. Max page size is 1k
+                                                 // after that, we have to use Google's next page token
+                                                 // to let us get more files.
+                                                 StreamWriter logFile = new StreamWriter(savelocation + ".recent.log");
                                                 string[] deltafiles = File.ReadAllLines(savelocation + ".deltalog.tok");
 
                                                 int totalfiles = deltafiles.Count();
@@ -232,6 +241,8 @@ namespace TuckerTech_GABackup_GUI
                                                 {
                                                     double damn = ((gtoken - double.Parse(txtPrevToken.Text)));
                                                     damn = Math.Round((damn / totalfiles));
+                                                    if (damn <= 0)
+                                                        damn = 1;
                                                     foreach (var file in deltafiles)
                                                     {
                                                         try
@@ -248,14 +259,15 @@ namespace TuckerTech_GABackup_GUI
                                                             cnttototal++;
                                                             bgW.ReportProgress(cnttototal);
                                                             proUser.Maximum = int.Parse(txtCurrentToken.Text);
-
                                                             stripLabel.Text = "File " + cnttototal + " of " + totalfiles;
                                                             double? mathisfun;
                                                             mathisfun = ((100 * cnttototal) / totalfiles);
+                                                            if (mathisfun <= 0 || mathisfun >= cnttototal) 
+                                                                mathisfun = 1;
                                                             double mathToken = double.Parse(txtPrevToken.Text);
                                                             mathToken = Math.Round((damn + mathToken));
-                                                            // Bring our token up to date for next run
-                                                            txtPrevToken.Text = mathToken.ToString();
+                                                             // Bring our token up to date for next run
+                                                             txtPrevToken.Text = mathToken.ToString();
                                                             File.WriteAllText(savelocation + ".currenttoken.tok", mathToken.ToString());
                                                             int proval = int.Parse(txtPrevToken.Text);
                                                             int nowval = int.Parse(txtCurrentToken.Text);
@@ -263,8 +275,8 @@ namespace TuckerTech_GABackup_GUI
                                                                 proval = nowval;
                                                             proUser.Value = (proval);
                                                             lblProgresslbl.Text = ("Current progress: " + mathisfun.ToString() + "% completed.");
-                                                            // Our file is a CSV. Column 1 = file ID, Column 2 = File name
-                                                            var values = file.Split(',');
+                                                             // Our file is a CSV. Column 1 = file ID, Column 2 = File name
+                                                             var values = file.Split(',');
                                                             string fileId = values[0];
                                                             string fileName = values[1];
                                                             string mimetype = values[2];
@@ -275,17 +287,17 @@ namespace TuckerTech_GABackup_GUI
                                                             int folderfilelen = foldervalues.Count();
 
                                                             fileName = GetSafeFilename(fileName);
-                                                            //fileName = fileName.Replace('\\', '_').Replace('/', '_').Replace(':', '_').Replace('!', '_').Replace('\'', '_').Replace('*', '_').Replace('#', '_').Replace('[', '_').Replace(']', '_').Replace(":","_");
+
                                                             Console.WriteLine("Filename: " + values[1]);
                                                             logFile.WriteLine("ID: " + values[0] + " - Filename: " + values[1]);
                                                             logFile.Flush();
 
 
-                                                            // Things get sloppy here. The reason we're checking MimeTypes
-                                                            // is because we have to export the files from Google's format
-                                                            // to a format that is readable by a desktop computer program
-                                                            // So for example, the google-apps.spreadsheet will become an MS Excel file.
-                                                            switch (mimetype)
+                                                             // Things get sloppy here. The reason we're checking MimeTypes
+                                                             // is because we have to export the files from Google's format
+                                                             // to a format that is readable by a desktop computer program
+                                                             // So for example, the google-apps.spreadsheet will become an MS Excel file.
+                                                             switch (mimetype)
                                                             {
                                                                 case "application/pdf":
                                                                     ext = ".pdf";
@@ -417,49 +429,51 @@ namespace TuckerTech_GABackup_GUI
                                                                 }
                                                                 if (fileName.Contains(".mov") || ext == ".ggl" || fileName.Contains(".mp4"))
                                                                 {
-                                                                    btnSkipFile.Text += Environment.NewLine + "Skipping file.";
+                                                                    txtLog.Text += Environment.NewLine + "Skipping file.";
                                                                     return;
                                                                 }
 
                                                                 var requestfileid = CreateService.BuildService(user).Files.Export(fileId, whatami);
                                                                 statusStripLabel1.Text = (savelocation + fileName + ext);
-
+                                                                txtCurrentUser.Text = user;
                                                                 string dest1 = Path.Combine(savelocation, fileName + ext);
                                                                 var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                                                                 scrolltobtm();
                                                                 requestfileid.MediaDownloader.ProgressChanged +=
-                                                                        (IDownloadProgress progress) =>
-                                                                        {
-                                                                            switch (progress.Status)
-                                                                            {
-                                                                                case DownloadStatus.Downloading:
-                                                                                    {
-                                                                                        Console.WriteLine(progress.BytesDownloaded);
-                                                                                        logFile.WriteLine("Downloading: " + progress.BytesDownloaded);
-                                                                                        btnSkipFile.Text += ("Downloading ... " + progress.BytesDownloaded + Environment.NewLine);
-                                                                                        scrolltobtm();
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                                case DownloadStatus.Completed:
-                                                                                    {
-                                                                                        Console.WriteLine("Download complete.");
-                                                                                        logFile.WriteLine("Download complete for: " + requestfileid.ToString());
-                                                                                        btnSkipFile.Text += ("Download complete for: " + fileName + Environment.NewLine);
-                                                                                        logFile.Flush();
+                                                                         (IDownloadProgress progress) =>
+                                                                         {
+                                                                                switch (progress.Status)
+                                                                                {
+                                                                                    case DownloadStatus.Downloading:
+                                                                                        {
+                                                                                            Console.WriteLine(progress.BytesDownloaded);
+                                                                                            logFile.WriteLine("Downloading: " + progress.BytesDownloaded);
+                                                                                            txtLog.Text += ("Downloading ... " + progress.BytesDownloaded + Environment.NewLine);
+                                                                                            scrolltobtm();
+                                                                                            logFile.Flush();
+                                                                                            break;
+                                                                                        }
+                                                                                    case DownloadStatus.Completed:
+                                                                                        {
+                                                                                            Console.WriteLine("Download complete.");
+                                                                                            logFile.WriteLine("[" + user + "] Download complete for: " + requestfileid.ToString());
+                                                                                            txtLog.Text += ("[" + user + "] Download complete for: " + fileName + Environment.NewLine);
+                                                                                            logFile.Flush();
 
-                                                                                        break;
-                                                                                    }
-                                                                                case DownloadStatus.Failed:
-                                                                                    {
-                                                                                        Console.WriteLine("Download failed.");
-                                                                                        logFile.WriteLine("Download failed.");
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                            }
-                                                                        };
+                                                                                            break;
+                                                                                        }
+                                                                                    case DownloadStatus.Failed:
+                                                                                        {
+                                                                                            Console.WriteLine("Download failed.");
+                                                                                            logFile.WriteLine("Download failed.");
+                                                                                            logFile.Flush();
+                                                                                            break;
+                                                                                        }
+                                                                                }
+                                                                            };
                                                                 scrolltobtm();
+                                                                GC.Collect();
+                                                                GC.WaitForPendingFinalizers();
                                                                 requestfileid.Download(stream1);
                                                                 stream1.Close();
                                                                 stream1.Dispose();
@@ -468,46 +482,49 @@ namespace TuckerTech_GABackup_GUI
                                                             {
                                                                 scrolltobtm();
                                                                 var requestfileid = CreateService.BuildService(user).Files.Get(fileId);
-                                                                //Generate the name of the file, and create it as such on the local filesystem.
-                                                                statusStripLabel1.Text = (savelocation + fileName + ext);
+                                                                 //Generate the name of the file, and create it as such on the local filesystem.
+                                                                 statusStripLabel1.Text = (savelocation + fileName + ext);
                                                                 string dest1 = Path.Combine(savelocation, fileName + ext);
                                                                 var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                                                                 requestfileid.MediaDownloader.ProgressChanged +=
-                                                                        (IDownloadProgress progress) =>
-                                                                        {
-                                                                            switch (progress.Status)
-                                                                            {
-                                                                                case DownloadStatus.Downloading:
-                                                                                    {
-                                                                                        Console.WriteLine(progress.BytesDownloaded);
-                                                                                        logFile.WriteLine("Downloading: " + progress.BytesDownloaded);
-                                                                                        btnSkipFile.Text += ("Downloading ... " + progress.BytesDownloaded + Environment.NewLine);
-                                                                                        scrolltobtm();
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                                case DownloadStatus.Completed:
-                                                                                    {
-                                                                                        Console.WriteLine("Download complete.");
-                                                                                        logFile.WriteLine("Download complete for: " + requestfileid.ToString());
-                                                                                        btnSkipFile.Text += (Environment.NewLine + "Download complete for: " + fileName + Environment.NewLine);
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                                case DownloadStatus.Failed:
-                                                                                    {
+                                                                         (IDownloadProgress progress) =>
+                                                                         {
+                                                                                switch (progress.Status)
+                                                                                {
+                                                                                    case DownloadStatus.Downloading:
+                                                                                        {
+                                                                                            Console.WriteLine(progress.BytesDownloaded);
+                                                                                            logFile.WriteLine("Downloading: " + progress.BytesDownloaded);
+                                                                                            txtLog.Text += ("Downloading ... " + progress.BytesDownloaded + Environment.NewLine);
+                                                                                            scrolltobtm();
+                                                                                            logFile.Flush();
+                                                                                            break;
+                                                                                        }
+                                                                                    case DownloadStatus.Completed:
+                                                                                        {
+                                                                                            Console.WriteLine("Download complete.");
+                                                                                            logFile.WriteLine("Download complete for: " + requestfileid.ToString());
+                                                                                            txtLog.Text += (Environment.NewLine + "[" + user + "] Download complete for: " + fileName + Environment.NewLine);
+                                                                                            logFile.Flush();
+                                                                                            break;
+                                                                                        }
+                                                                                    case DownloadStatus.Failed:
+                                                                                        {
 
-                                                                                        Console.WriteLine("Download failed.");
-                                                                                        logFile.WriteLine("Download failed.");
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                            }
-                                                                        };
+                                                                                            Console.WriteLine("Download failed.");
+                                                                                            logFile.WriteLine("Download failed.");
+                                                                                            logFile.Flush();
+                                                                                            break;
+                                                                                        }
+                                                                                }
+                                                                            };
                                                                 scrolltobtm();
+                                                                GC.Collect();
+                                                                GC.WaitForPendingFinalizers();
                                                                 requestfileid.Download(stream1);
                                                                 stream1.Close();
                                                                 stream1.Dispose();
+
                                                             }
                                                         }
                                                         catch (Google.GoogleApiException ex)
@@ -518,11 +535,14 @@ namespace TuckerTech_GABackup_GUI
                                                 }
                                                 exfunctions.MoveFiles(savelocation);
                                                 Console.WriteLine("\n\n\tBackup completed for selected user!");
-                                                btnSkipFile.Text += ("\n\nBackup completed for selected user.\n\n");
+                                                txtLog.Text += ("\n\nBackup completed for selected user.\n\n");
                                                 statusStripLabel1.Text = "";
-                                                logFile.Close();
-                                                logFile.Dispose();
+
+                                                //logFile.Close();
+                                                //logFile.Dispose();
+
                                             }
+
                                         }
 
                                     }
@@ -530,6 +550,17 @@ namespace TuckerTech_GABackup_GUI
                                     {
                                         Console.WriteLine("Info: " + ex.Message.ToString());
                                     }
+                                }
+                                );
+                                if (checkforfinished.IsCompleted == true)
+                                {
+                                    MessageBox.Show("Parallel.ForEach() Finished!");
+                                    Console.WriteLine("Parallel.ForEach() Finished!");
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Parallel.ForEach() not completed!");
+                                    Console.WriteLine("Parallel.ForEach() not completed!");
                                 }
                             }
                         }
@@ -836,10 +867,10 @@ namespace TuckerTech_GABackup_GUI
                 string googletype = null;
 
 
-                btnSkipFile.Text += ("Restoring File \"" + lstFiles.SelectedItems[0].Text + "\" to " + unonly + " root drive" + Environment.NewLine);
-                statusStripLabel1.Text = "Restoring "+lstFiles.SelectedItems[0].Text + " ... please wait.";
+                txtLog.Text += ("Restoring File \"" + lstFiles.SelectedItems[0].Text + "\" to " + unonly + " root drive" + Environment.NewLine);
+                statusStripLabel1.Text = "Restoring " + lstFiles.SelectedItems[0].Text + " ... please wait.";
                 Google.Apis.Drive.v3.Data.File fileMetadata = new Google.Apis.Drive.v3.Data.File();
-                fileMetadata.Name = lstFiles.SelectedItems[0].Text + "_RESTORE_"+rndfileadd;
+                fileMetadata.Name = lstFiles.SelectedItems[0].Text + "_RESTORE_" + rndfileadd;
                 switch (findext)
                 {
                     case "xlsx":
@@ -900,16 +931,16 @@ namespace TuckerTech_GABackup_GUI
                     request.Upload();
                 }
                 var file = request.ResponseBody;
-                btnSkipFile.Text += (lstFiles.SelectedItems[0].Text + " was successfully restored to " + unonly + "'s drive" + Environment.NewLine);
+                txtLog.Text += (lstFiles.SelectedItems[0].Text + " was successfully restored to " + unonly + "'s drive" + Environment.NewLine);
                 statusStripLabel1.Text = "File was successfully restored!";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Sorry, I don't support this action yet. I can only restore files.\n\n[Debug] Literal error is:\n" +ex.Message.ToString(),"Unsupported action",MessageBoxButtons.OK,MessageBoxIcon.Asterisk);
-                btnSkipFile.Text += Environment.NewLine + "Failed to restore file!" + Environment.NewLine;
+                MessageBox.Show("Sorry, I don't support this action yet. I can only restore files.\n\n[Debug] Literal error is:\n" + ex.Message.ToString(), "Unsupported action", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                txtLog.Text += Environment.NewLine + "Failed to restore file!" + Environment.NewLine;
             }
         }
-        
+
         private void btnStart_Click(object sender, EventArgs e)
         {
             Startitup();
@@ -967,8 +998,8 @@ namespace TuckerTech_GABackup_GUI
 
         private void txtLog_TextChanged(object sender, EventArgs e)
         {
-            btnSkipFile.SelectionStart = btnSkipFile.Text.Length;
-            btnSkipFile.ScrollToCaret();
+            txtLog.SelectionStart = txtLog.Text.Length;
+            txtLog.ScrollToCaret();
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -1065,8 +1096,8 @@ namespace TuckerTech_GABackup_GUI
 
         private void scrolltobtm()
         {
-            btnSkipFile.SelectionStart = btnSkipFile.Text.Length;
-            btnSkipFile.ScrollToCaret();
+            txtLog.SelectionStart = txtLog.Text.Length;
+            txtLog.ScrollToCaret();
         }
 
         private void lblUnread_Click(object sender, EventArgs e)
@@ -1077,6 +1108,41 @@ namespace TuckerTech_GABackup_GUI
         private void metroButton1_Click(object sender, EventArgs e)
         {
             bgW.CancelAsync();
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            if (FormWindowState.Minimized == this.WindowState)
+            {
+                notifyTray.Visible = true;
+                //notifyTray.ShowBalloonTip(500);
+                this.Hide();
+            }
+            else if (FormWindowState.Normal == this.WindowState)
+            {
+                notifyTray.Visible = true;
+            }
+        }
+
+        private void notifyTray_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
+            notifyTray.Visible = false;
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
+            notifyTray.Visible = false;
         }
     }
 
@@ -1119,7 +1185,7 @@ namespace TuckerTech_GABackup_GUI
                 return null;
             }
 
-    }
+        }
 
     }
 
