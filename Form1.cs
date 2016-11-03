@@ -135,7 +135,7 @@ namespace TuckerTech_GABackup_GUI
                                 var opts = new ParallelOptions { MaxDegreeOfParallelism = 1 };
                                 if (Environment.Is64BitOperatingSystem == true) // x64, let's use all our set preference instead.
                                 {
-                                    opts = new ParallelOptions { MaxDegreeOfParallelism = totalresource };
+                                    opts = new ParallelOptions {  MaxDegreeOfParallelism = lstBackupUsers.Items.Count };
                                 }
                                 // foreach (ListViewItem name in lstBackupUsers.Items)
                                 var checkforfinished = Parallel.ForEach(lstBackupUsers.Items.Cast<ListViewItem>(), opts, name =>
