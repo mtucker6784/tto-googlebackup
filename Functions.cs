@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -49,11 +49,13 @@ namespace TuckerTech_GABackup_GUI
                     {
                         Directory.Move(savelocation + x.b[3], x.a[1] + x.b[3]);
                         Console.WriteLine("Moving sub directory: " + x.a[1] + x.b[3] + "\n");
+                        Thread.Sleep(100);
                         finaldir.WriteLine(x.b[2] + "," + x.a[1] + x.b[3] + "," + x.a[1] + "," + x.b[3] + "," + x.b[0]);
                     }
                     else
                     {
                         finaldir.Write(x.b[2] + "," + savelocation);
+                        Thread.Sleep(100);
                         Console.WriteLine("next...");
                     }
                 }
@@ -67,8 +69,6 @@ namespace TuckerTech_GABackup_GUI
             }
             finaldir.Flush();
             finaldir.Close();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
 
         public static void MoveFiles(string savelocation)
@@ -224,6 +224,7 @@ namespace TuckerTech_GABackup_GUI
                     x.a[1] = x.a[1].Replace('"', '\\');
                     if (x.b[3] == x.c[4])
                     {
+                        Thread.Sleep(100);
                         destfile = (x.c[1] + "\\" + x.b[1] + ext);
                         Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
                         File.Move(origfile, destfile);
@@ -231,6 +232,7 @@ namespace TuckerTech_GABackup_GUI
                     }
                     else if (x.a[0] == x.b[3])
                     {
+                        Thread.Sleep(100);
                         destfile = (x.a[1] + "\\" + x.b[1] + ext);
                         Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
                         File.Move(origfile, destfile);
@@ -280,6 +282,7 @@ namespace TuckerTech_GABackup_GUI
                         subfolder.Add(sendreq.Name);
                         foreach (string sub in subfolder)
                         {
+                            Thread.Sleep(100);
                             folderid = String.Join(",", change.Parents);
                             folderid = ("," + folderid + "," + sub.ToString());
                             string subreplace = sub.Replace(":", "_");
@@ -325,8 +328,6 @@ namespace TuckerTech_GABackup_GUI
             folderlog.Close();
             folderlog.Dispose();
             CreateSubDir(savelocation);
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
         public static void ChangesFileList(string savedStartPageToken, string pageToken, string user, string savelocation)
         {
@@ -380,6 +381,10 @@ namespace TuckerTech_GABackup_GUI
                                     updatedfile = updatedfile.Replace(",", "_").Replace("\"", "_").Replace("(", "-").Replace(")", "-").Replace("?", "_").Replace("<", "_").Replace(">", "_").Replace(";", "_").Replace("$", "_").Replace("@", "_").Replace("!", "_").Replace("|", "_").Replace(":", "_");
                                     logFile.WriteLine(user + ": New or changed file found: " + change.FileId + " --- " + updatedfile);
                                     logFile.Flush();
+                                    if (updatedfile.Length >= 35)
+                                    {
+                                        updatedfile = (updatedfile.Substring(0,35) + "...");
+                                    }
                                     if (mimetype == "application/vnd.google-apps.folder")
                                     {
                                         //
@@ -387,6 +392,7 @@ namespace TuckerTech_GABackup_GUI
 
                                     else
                                     {
+                                        Thread.Sleep(100);
                                         deltalog.WriteLine(change.FileId + "," + updatedfile + "," + mimetype + "," + folderid);
                                         deltalog.Flush();
                                     }
@@ -447,8 +453,6 @@ namespace TuckerTech_GABackup_GUI
                 deltalog.Dispose();
                 logFile.Dispose();
                 //Form1.proUserclass.Value = 0;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
 
         }

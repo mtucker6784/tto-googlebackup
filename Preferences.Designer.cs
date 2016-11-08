@@ -327,6 +327,7 @@
             // metroPanel2
             // 
             this.metroPanel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.metroPanel2.CausesValidation = false;
             this.metroPanel2.Controls.Add(this.txtProcessors);
             this.metroPanel2.Controls.Add(this.lblMultithread);
             this.metroPanel2.Controls.Add(this.btnSaveMB);
@@ -383,9 +384,9 @@
             this.lblMultithread.AutoSize = true;
             this.lblMultithread.Location = new System.Drawing.Point(16, 49);
             this.lblMultithread.Name = "lblMultithread";
-            this.lblMultithread.Size = new System.Drawing.Size(248, 19);
+            this.lblMultithread.Size = new System.Drawing.Size(276, 19);
             this.lblMultithread.TabIndex = 16;
-            this.lblMultithread.Text = "Use up to the following number of cores:";
+            this.lblMultithread.Text = "Resources (by percent) for backup dedication:";
             this.tipBiggerThan.SetToolTip(this.lblMultithread, resources.GetString("lblMultithread.ToolTip"));
             // 
             // btnSaveMB
