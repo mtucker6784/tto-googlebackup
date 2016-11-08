@@ -8,7 +8,6 @@ using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
@@ -18,12 +17,13 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TuckerTech_GABackup_GUI
 {
 
-    //    public partial class Form1 : Syncfusion.Windows.Forms.Tools.RibbonForm
     public partial class Form1 : Form
     {
         // Google wanted me to define these.
@@ -34,7 +34,7 @@ namespace TuckerTech_GABackup_GUI
         {
             set
             {
-                this.btnSkipFile.Text = value;
+                this.txtLog.Text = value;
             }
         }
 
@@ -43,7 +43,7 @@ namespace TuckerTech_GABackup_GUI
         static string nothing2 = ("Nothing to new to save!\n" + Environment.NewLine);
         public Form1()
         {
-            
+
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
         }
@@ -111,7 +111,7 @@ namespace TuckerTech_GABackup_GUI
 
                     string userfile = txtFile.Text;
                     int counter = 0;
-                    int arraycount = 0;
+
 
                     if (bgW.CancellationPending)
                     {
@@ -130,410 +130,457 @@ namespace TuckerTech_GABackup_GUI
                             }
                             else
                             {
-                                foreach (ListViewItem name in lstBackupUsers.Items)
+                                int totalresource = int.Parse(ConfigurationManager.AppSettings["multithread"]);
+                                var opts = new ParallelOptions { MaxDegreeOfParallelism = 1 };
+                                if (Environment.Is64BitOperatingSystem == true) // x64, let's use all our set preference instead.
                                 {
+                                    opts = new ParallelOptions { MaxDegreeOfParallelism = lstBackupUsers.Items.Count };
+                                }
+                                int arraycount = 0;
+                                var curIndex = 0;
+                                int usercount = lstBackupUsers.Items.Count;
+                                string curdate = DateTime.Now.Month.ToString() + "-" + DateTime.Now.Day.ToString() + "-" + DateTime.Now.Hour.ToString() + "." + DateTime.Now.Minute.ToString() +"."+ DateTime.Now.Second.ToString();
+                                StreamWriter logfile = new StreamWriter(Environment.CurrentDirectory+"\\Logs\\MasterLogFile_"+curdate+".log",true);
+
+                                var checkforfinished = Parallel.ForEach(lstBackupUsers.Items.Cast<ListViewItem>(), opts, name =>
+                                    {
                                     try
                                     {
-                                        string names = name.SubItems[0].Text;
-                                        lstBackupUsers.Items[arraycount].Selected = true;
-                                        lstBackupUsers.Items[arraycount].BackColor = Color.CornflowerBlue;
-                                        arraycount++;
-                                        stripLabel.Text = "";
-                                        Console.WriteLine("Selecting user: " + names.ToString());
-                                        txtCurrentUser.Text = names.ToString();
-                                        // Define parameters of request.
-                                        string user = names.ToString();
+                                            Console.WriteLine("Selecting row: " + arraycount.ToString());
+                                            string names = name.SubItems[0].Text;
+                                            if (arraycount == usercount)
+                                                return;
+                                            lstBackupUsers.Items[name.Index].Selected = true;
+                                            lstBackupUsers.Items[name.Index].BackColor = Color.CornflowerBlue;
+                                            curIndex = Interlocked.Increment(ref arraycount);
+                                            stripLabel.Text = "";
+                                            counter++;
+                                            Console.WriteLine("Selecting user: " + names.ToString());
+                                            txtLog.Text += "Selecting user: " + names.ToString() + Environment.NewLine;
+                                            logfile.WriteLine("Selecting user: " + names.ToString() + Environment.NewLine);
+                                            txtCurrentUser.Text = names.ToString();
+                                            // Define parameters of request.
+                                            string user = names.ToString();
 
-                                        // Check if directory exists, create if not.
-                                        string savelocation = ConfigurationManager.AppSettings["savelocation"] + user + "\\";
-                                        if (File.Exists(savelocation + ".deltalog.tok"))
-                                            File.Delete(savelocation + ".deltalog.tok");
-                                        FileInfo testdir = new FileInfo(savelocation);
-                                        testdir.Directory.Create();
-                                        string savedStartPageToken = "";
-                                        var start = CreateService.BuildService(user).Changes.GetStartPageToken().Execute();
+                                            // Check if directory exists, create if not.
+                                            string savelocation = ConfigurationManager.AppSettings["savelocation"] + user + "\\";
 
-                                        // This token is set by Google, it defines changes made and
-                                        // increments the token value automatically. 
-                                        // The following reads the current token file (if it exists)
-                                        if (File.Exists(savelocation + ".currenttoken.tok"))
-                                        {
-                                            StreamReader curtokenfile = new StreamReader(savelocation + ".currenttoken.tok");
-                                            savedStartPageToken = curtokenfile.ReadLine().ToString();
-                                            curtokenfile.Dispose();
-                                        }
-                                        else
-                                        {
-                                            // Token record didn't exist. Create a generic file, start at "1st" token
-                                            // In reality, I have no idea what token to start at, but 1 seems to be safe.
-                                            Console.Write("Creating new token file.\n");
-                                            //txtLog.Text += ("Creating new token file.\n" + Environment.NewLine);
-                                            StreamWriter sw = new StreamWriter(savelocation + ".currenttoken.tok");
-                                            sw.Write(1);
-                                            sw.Dispose();
-                                            savedStartPageToken = "1";
-                                        }
-                                        string pageToken = savedStartPageToken;
-                                        int gtoken = int.Parse(start.StartPageTokenValue);
-                                        int mytoken = int.Parse(savedStartPageToken);
-                                        txtPrevToken.Text = pageToken.ToString();
-                                        txtCurrentToken.Text = gtoken.ToString();
+                                            if (File.Exists(savelocation + ".deltalog.tok"))
+                                                File.Delete(savelocation + ".deltalog.tok");
+                                            FileInfo testdir = new FileInfo(savelocation);
+                                            testdir.Directory.Create();
+                                            string savedStartPageToken = "";
+                                            var start = CreateService.BuildService(user).Changes.GetStartPageToken().Execute();
 
-                                        if (gtoken <= 10)
-                                        {
-                                            Console.WriteLine("Nothing to save!\n");
-                                            //txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
-                                        }
-                                        else
-                                        {
-                                            if (pageToken == start.StartPageTokenValue)
+                                            // This token is set by Google, it defines changes made and
+                                            // increments the token value automatically. 
+                                            // The following reads the current token file (if it exists)
+                                            if (File.Exists(savelocation + ".currenttoken.tok"))
                                             {
-                                                Console.WriteLine("No file changes found for " + user + "\n");
-                                                //txtLog.Text += ("No file changes found! Please wait while I tidy up." + Environment.NewLine);
+                                                StreamReader curtokenfile = new StreamReader(savelocation + ".currenttoken.tok");
+                                                savedStartPageToken = curtokenfile.ReadLine().ToString();
+                                                curtokenfile.Dispose();
                                             }
                                             else
                                             {
-                                                // .deltalog.tok is where we will place our records for changed files
-                                                Console.WriteLine("Changes detected. Making notes while we go through these.");
-                                                lblProgresslbl.Text = "Scanning Drive directory.";
-
-                                                // Damnit Google, why did you change how the change fields work?
-                                                if (savedStartPageToken == "1")
+                                                // Token record didn't exist. Create a generic file, start at "1st" token
+                                                // In reality, I have no idea what token to start at, but 1 seems to be safe.
+                                                Console.Write("Creating new token file.\n");
+                                                //txtLog.Text += ("Creating new token file.\n" + Environment.NewLine);
+                                                StreamWriter sw = new StreamWriter(savelocation + ".currenttoken.tok");
+                                                sw.Write(1);
+                                                sw.Dispose();
+                                                savedStartPageToken = "1";
+                                            }
+                                            string pageToken = savedStartPageToken;
+                                            int gtoken = int.Parse(start.StartPageTokenValue);
+                                            int mytoken = int.Parse(savedStartPageToken);
+                                            txtPrevToken.Text = pageToken.ToString();
+                                            txtCurrentToken.Text = gtoken.ToString();
+                                            if (gtoken <= 10)
+                                            {
+                                            Console.WriteLine("Nothing to save!\n" + Environment.NewLine);
+                                                //txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
+                                            }
+                                            else
+                                            {
+                                                if (pageToken == start.StartPageTokenValue)
                                                 {
-                                                    statusStripLabel1.Text = "Recording folder list ...";
-                                                    btnSkipFile.Text = "Recording folder list ..." + Environment.NewLine;
-                                                    exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
-                                                    statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!" ;
-                                                    btnSkipFile.Text += Environment.NewLine + "Recording new/changed list for: " + user;
-                                                    exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
+                                                    Console.WriteLine("No file changes found for " + user + "\n" + Environment.NewLine);
+                                                    //txtLog.Text += ("No file changes found! Please wait while I tidy up." + Environment.NewLine);
                                                 }
                                                 else
                                                 {
-                                                    //proUserclass = proUser;
-                                                    statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
-                                                    btnSkipFile.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
-                                                    exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
-                                                }
+                                                    // .deltalog.tok is where we will place our records for changed files
+                                                    Console.WriteLine("Changes detected. Making notes while we go through these.");
+                                                    lblProgresslbl.Text = "Scanning Drive directory.";
 
-                                                // Get all our files for the user. Max page size is 1k
-                                                // after that, we have to use Google's next page token
-                                                // to let us get more files.
-                                                StreamWriter logFile = new StreamWriter(savelocation + ".recent.log");
-                                                string[] deltafiles = File.ReadAllLines(savelocation + ".deltalog.tok");
-
-                                                int totalfiles = deltafiles.Count();
-                                                int cnttototal = 0;
-                                                Console.WriteLine("\nFiles to backup:\n");
-                                                if (deltafiles == null)
-                                                {
-                                                    return;
-                                                }
-                                                else
-                                                {
-                                                    double damn = ((gtoken - double.Parse(txtPrevToken.Text)));
-                                                    damn = Math.Round((damn / totalfiles));
-                                                    foreach (var file in deltafiles)
+                                                    // Damnit Google, why did you change how the change fields work?
+                                                    if (savedStartPageToken == "1")
                                                     {
-                                                        try
+                                                        statusStripLabel1.Text = "Recording folder list ...";
+                                                        txtLog.Text = "Recording folder list ..." + Environment.NewLine;
+                                                        logfile.WriteLine(user + " --- Recording folder list..." + Environment.NewLine);
+                                                        exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
+                                                        statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
+                                                        txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
+                                                        exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
+                                                    }
+                                                    else
+                                                    {
+                                                        //proUserclass = proUser;
+                                                        statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
+                                                        txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
+                                                        exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
+                                                    }
+
+                                                    // Get all our files for the user. Max page size is 1k
+                                                    // after that, we have to use Google's next page token
+                                                    // to let us get more files.
+                                                    StreamWriter logFile = new StreamWriter(savelocation + ".recent.log");
+                                                    string[] deltafiles = File.ReadAllLines(savelocation + ".deltalog.tok");
+
+                                                    int totalfiles = deltafiles.Count();
+                                                    int cnttototal = 0;
+                                                    Console.WriteLine("\nFiles to backup:\n");
+                                                    if (deltafiles == null)
+                                                    {
+                                                        return;
+                                                    }
+                                                    else
+                                                    {
+                                                        double damn = ((gtoken - double.Parse(txtPrevToken.Text)));
+                                                        damn = Math.Round((damn / totalfiles));
+                                                        if (damn <= 0)
+                                                            damn = 1;
+                                                        foreach (var file in deltafiles)
                                                         {
-                                                            if (bgW.CancellationPending)
+                                                            try
                                                             {
-                                                                stripLabel.Text = "Backup canceled!";
-                                                                e.Cancel = true;
-                                                                break;
-                                                            }
-                                                            DateTime dt = DateTime.Now;
-                                                            string[] foldervalues = File.ReadAllLines(savelocation + "folderlog.txt");
-
-                                                            cnttototal++;
-                                                            bgW.ReportProgress(cnttototal);
-                                                            proUser.Maximum = int.Parse(txtCurrentToken.Text);
-
-                                                            stripLabel.Text = "File " + cnttototal + " of " + totalfiles;
-                                                            double? mathisfun;
-                                                            mathisfun = ((100 * cnttototal) / totalfiles);
-                                                            double mathToken = double.Parse(txtPrevToken.Text);
-                                                            mathToken = Math.Round((damn + mathToken));
-                                                            // Bring our token up to date for next run
-                                                            txtPrevToken.Text = mathToken.ToString();
-                                                            File.WriteAllText(savelocation + ".currenttoken.tok", mathToken.ToString());
-                                                            int proval = int.Parse(txtPrevToken.Text);
-                                                            int nowval = int.Parse(txtCurrentToken.Text);
-                                                            if (proval >= nowval)
-                                                                proval = nowval;
-                                                            proUser.Value = (proval);
-                                                            lblProgresslbl.Text = ("Current progress: " + mathisfun.ToString() + "% completed.");
-                                                            // Our file is a CSV. Column 1 = file ID, Column 2 = File name
-                                                            var values = file.Split(',');
-                                                            string fileId = values[0];
-                                                            string fileName = values[1];
-                                                            string mimetype = values[2];
-                                                            mimetype = mimetype.Replace(",", "_");
-                                                            string folder = values[3];
-                                                            string ext = null;
-
-                                                            int folderfilelen = foldervalues.Count();
-
-                                                            fileName = GetSafeFilename(fileName);
-                                                            //fileName = fileName.Replace('\\', '_').Replace('/', '_').Replace(':', '_').Replace('!', '_').Replace('\'', '_').Replace('*', '_').Replace('#', '_').Replace('[', '_').Replace(']', '_').Replace(":","_");
-                                                            Console.WriteLine("Filename: " + values[1]);
-                                                            logFile.WriteLine("ID: " + values[0] + " - Filename: " + values[1]);
-                                                            logFile.Flush();
-
-
-                                                            // Things get sloppy here. The reason we're checking MimeTypes
-                                                            // is because we have to export the files from Google's format
-                                                            // to a format that is readable by a desktop computer program
-                                                            // So for example, the google-apps.spreadsheet will become an MS Excel file.
-                                                            switch (mimetype)
-                                                            {
-                                                                case "application/pdf":
-                                                                    ext = ".pdf";
-                                                                    break;
-                                                                case "application/vnd.google-apps.document":
-                                                                    ext = ".docx";
-                                                                    break;
-                                                                case "audio/wav":
-                                                                    ext = ".wav";
-                                                                    break;
-                                                                case "application/vnd.google-apps.spreadsheet":
-                                                                    ext = ".xlsx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.ritz":
-                                                                    ext = ".xlsx";
-                                                                    break;
-                                                                case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                                                                    ext = ".xlsx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.kix":
-                                                                    ext = ".docx";
-                                                                    break;
-                                                                case "application/msword":
-                                                                    ext = ".docx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.presentation":
-                                                                    ext = ".pptx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.punch":
-                                                                    ext = ".pptx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.form":
-                                                                    ext = ".docx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.freebird":
-                                                                    ext = ".docx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.drawing":
-                                                                    ext = ".ggl";
-                                                                    break;
-                                                                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                                                                    ext = ".docx";
-                                                                    break;
-                                                                case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-                                                                    ext = ".pptx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.drive-sdk":
-                                                                    ext = ".ggl";
-                                                                    break;
-                                                                case "image/gif":
-                                                                    ext = ".gif";
-                                                                    break;
-                                                                case "application/vnd.google.drive.ext-type.jpg":
-                                                                    ext = ".jpg";
-                                                                    break;
-                                                                case "image/jpeg":
-                                                                    ext = ".jpg";
-                                                                    break;
-                                                                case "application/vnd.google.drive.ext-type.png":
-                                                                    ext = ".png";
-                                                                    break;
-                                                                case "image/png":
-                                                                    ext = ".png";
-                                                                    break;
-                                                                case "application/vnd.google.drive.ext-type.gif":
-                                                                    ext = ".gif";
-                                                                    break;
-                                                                case "text/plain":
-                                                                    ext = ".txt";
-                                                                    break;
-                                                                case "application/vnd.google-apps.audio":
-                                                                    ext = ".mp3";
-                                                                    break;
-                                                                case "application/vnd.google-apps.file":
-                                                                    ext = ".docx";
-                                                                    break;
-                                                                case "application/vnd.google-apps.photo":
-                                                                    ext = ".jpg";
-                                                                    break;
-                                                                case "application/vnd.google-apps.video":
-                                                                    ext = ".mp4";
-                                                                    break;
-                                                                case "application/vnd.google-apps.script+json":
-                                                                    ext = ".json";
-                                                                    break;
-                                                                case "text/html":
-                                                                    ext = ".html";
-                                                                    break;
-                                                                case "application/rtf":
-                                                                    ext = ".rtf";
-                                                                    break;
-                                                                case "application/vnd.oasis.opendocument.text":
-                                                                    ext = ".docx";
-                                                                    break;
-                                                                case "text/csv":
-                                                                    ext = ".csv";
-                                                                    break;
-                                                                case "application/vnd.google-apps.unknown":
-                                                                    ext = ".ggl";
-                                                                    break;
-                                                                case "application/vnd.google-apps.drive-sdk.758379822725":
-                                                                    ext = ".ggl";
-                                                                    break;
-                                                                case "application/vnd.google-apps.map":
-                                                                    ext = ".gglmap";
-                                                                    break;
-                                                                case "application/octet-stream":
-                                                                    ext = ".txt";
-                                                                    break;
-                                                                default:
-                                                                    ext = ".ggl";
-                                                                    break;
-                                                            }
-
-                                                            if (ext.Contains(".doc") || ext.Contains(".xls"))
-                                                            {
-                                                                string whatami = null;
-                                                                if (ext.Contains(".xls"))
+                                                                if (bgW.CancellationPending)
                                                                 {
-                                                                    whatami = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                                                                    stripLabel.Text = "Backup canceled!";
+                                                                    e.Cancel = true;
+                                                                    break;
                                                                 }
-                                                                else if (ext.Contains(".doc"))
+                                                                DateTime dt = DateTime.Now;
+                                                                string[] foldervalues = File.ReadAllLines(savelocation + "folderlog.txt");
+
+                                                                cnttototal++;
+                                                                bgW.ReportProgress(cnttototal);
+                                                                proUser.Maximum = int.Parse(txtCurrentToken.Text);
+                                                                stripLabel.Text = "File " + cnttototal + " of " + totalfiles;
+                                                                double? mathisfun = 1;
+                                                                mathisfun = ((100 * cnttototal) / totalfiles);
+                                                                if (mathisfun <= 0 || mathisfun >= cnttototal)
+                                                                    mathisfun = 1;
+                                                                double mathToken = double.Parse(txtPrevToken.Text);
+                                                                mathToken = Math.Round((damn + mathToken));
+                                                                // Bring our token up to date for next run
+                                                                txtPrevToken.Text = mathToken.ToString();
+                                                                File.WriteAllText(savelocation + ".currenttoken.tok", mathToken.ToString());
+                                                                int proval = int.Parse(txtPrevToken.Text);
+                                                                int nowval = int.Parse(txtCurrentToken.Text);
+                                                                if (proval >= nowval)
+                                                                    proval = nowval;
+                                                                proUser.Value = (proval);
+                                                                lblProgresslbl.Text = ("Current progress: " + mathisfun.ToString() + "% completed.");
+                                                                // Our file is a CSV. Column 1 = file ID, Column 2 = File name
+                                                                var values = file.Split(',');
+                                                                string fileId = values[0];
+                                                                string fileName = values[1];
+                                                                string mimetype = values[2];
+                                                                mimetype = mimetype.Replace(",", "_");
+                                                                string folder = values[3];
+                                                                string ext = null;
+
+                                                                int folderfilelen = foldervalues.Count();
+
+                                                                fileName = GetSafeFilename(fileName);
+
+                                                                Console.WriteLine("Filename: " + values[1]);
+                                                                logFile.WriteLine("ID: " + values[0] + " - Filename: " + values[1]);
+                                                                logFile.Flush();
+
+
+                                                                // Things get sloppy here. The reason we're checking MimeTypes
+                                                                // is because we have to export the files from Google's format
+                                                                // to a format that is readable by a desktop computer program
+                                                                // So for example, the google-apps.spreadsheet will become an MS Excel file.
+                                                                switch (mimetype)
                                                                 {
-                                                                    whatami = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-                                                                }
-                                                                else if (ext.Contains(".ppt"))
-                                                                {
-                                                                    whatami = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-                                                                }
-                                                                if (fileName.Contains(".mov") || ext == ".ggl" || fileName.Contains(".mp4"))
-                                                                {
-                                                                    btnSkipFile.Text += Environment.NewLine + "Skipping file.";
-                                                                    return;
+                                                                    case "application/pdf":
+                                                                        ext = ".pdf";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.document":
+                                                                        ext = ".docx";
+                                                                        break;
+                                                                    case "audio/wav":
+                                                                        ext = ".wav";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.spreadsheet":
+                                                                        ext = ".xlsx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.ritz":
+                                                                        ext = ".xlsx";
+                                                                        break;
+                                                                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                                                                        ext = ".xlsx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.kix":
+                                                                        ext = ".docx";
+                                                                        break;
+                                                                    case "application/msword":
+                                                                        ext = ".docx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.presentation":
+                                                                        ext = ".pptx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.punch":
+                                                                        ext = ".pptx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.form":
+                                                                        ext = ".docx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.freebird":
+                                                                        ext = ".docx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.drawing":
+                                                                        ext = ".ggl";
+                                                                        break;
+                                                                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                                                                        ext = ".docx";
+                                                                        break;
+                                                                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                                                                        ext = ".pptx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.drive-sdk":
+                                                                        ext = ".ggl";
+                                                                        break;
+                                                                    case "image/gif":
+                                                                        ext = ".gif";
+                                                                        break;
+                                                                    case "application/vnd.google.drive.ext-type.jpg":
+                                                                        ext = ".jpg";
+                                                                        break;
+                                                                    case "image/jpeg":
+                                                                        ext = ".jpg";
+                                                                        break;
+                                                                    case "application/vnd.google.drive.ext-type.png":
+                                                                        ext = ".png";
+                                                                        break;
+                                                                    case "image/png":
+                                                                        ext = ".png";
+                                                                        break;
+                                                                    case "application/vnd.google.drive.ext-type.gif":
+                                                                        ext = ".gif";
+                                                                        break;
+                                                                    case "text/plain":
+                                                                        ext = ".txt";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.audio":
+                                                                        ext = ".mp3";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.file":
+                                                                        ext = ".docx";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.photo":
+                                                                        ext = ".jpg";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.video":
+                                                                        ext = ".mp4";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.script+json":
+                                                                        ext = ".json";
+                                                                        break;
+                                                                    case "text/html":
+                                                                        ext = ".html";
+                                                                        break;
+                                                                    case "application/rtf":
+                                                                        ext = ".rtf";
+                                                                        break;
+                                                                    case "application/vnd.oasis.opendocument.text":
+                                                                        ext = ".docx";
+                                                                        break;
+                                                                    case "text/csv":
+                                                                        ext = ".csv";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.unknown":
+                                                                        ext = ".ggl";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.drive-sdk.758379822725":
+                                                                        ext = ".ggl";
+                                                                        break;
+                                                                    case "application/vnd.google-apps.map":
+                                                                        ext = ".gglmap";
+                                                                        break;
+                                                                    case "application/octet-stream":
+                                                                        ext = ".txt";
+                                                                        break;
+                                                                    default:
+                                                                        ext = ".ggl";
+                                                                        break;
                                                                 }
 
-                                                                var requestfileid = CreateService.BuildService(user).Files.Export(fileId, whatami);
-                                                                statusStripLabel1.Text = (savelocation + fileName + ext);
+                                                                if (ext.Contains(".doc") || ext.Contains(".xls"))
+                                                                {
+                                                                    string whatami = null;
+                                                                    if (ext.Contains(".xls"))
+                                                                    {
+                                                                        whatami = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                                                                    }
+                                                                    else if (ext.Contains(".doc"))
+                                                                    {
+                                                                        whatami = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                                                                    }
+                                                                    else if (ext.Contains(".ppt"))
+                                                                    {
+                                                                        whatami = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+                                                                    }
+                                                                    if (fileName.Contains(".mov") || ext == ".ggl" || fileName.Contains(".mp4"))
+                                                                    {
+                                                                        txtLog.Text += Environment.NewLine + "Skipping file.";
+                                                                        return;
+                                                                    }
 
-                                                                string dest1 = Path.Combine(savelocation, fileName + ext);
-                                                                dest1 = GetSafeFilename(dest1);
-                                                                
-                                                                var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                                                                scrolltobtm();
-                                                                requestfileid.MediaDownloader.ProgressChanged +=
-                                                                        (IDownloadProgress progress) =>
-                                                                        {
-                                                                            switch (progress.Status)
-                                                                            {
-                                                                                case DownloadStatus.Downloading:
-                                                                                    {
-                                                                                        Console.WriteLine(progress.BytesDownloaded);
-                                                                                        logFile.WriteLine("Downloading: " + progress.BytesDownloaded);
-                                                                                        btnSkipFile.Text += ("Downloading ... " + progress.BytesDownloaded + Environment.NewLine);
-                                                                                        scrolltobtm();
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                                case DownloadStatus.Completed:
-                                                                                    {
-                                                                                        Console.WriteLine("Download complete.");
-                                                                                        logFile.WriteLine("Download complete for: " + requestfileid.ToString());
-                                                                                        btnSkipFile.Text += ("Download complete for: " + fileName + Environment.NewLine);
-                                                                                        logFile.Flush();
+                                                                    var requestfileid = CreateService.BuildService(user).Files.Export(fileId, whatami);
+                                                                    statusStripLabel1.Text = (savelocation + fileName + ext);
+                                                                    txtCurrentUser.Text = user;
+                                                                    string dest1 = Path.Combine(savelocation, fileName + ext);
+                                                                    var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                                                    scrolltobtm();
+                                                                    Thread.Sleep(1000);
+                                                                    requestfileid.MediaDownloader.ProgressChanged +=
+                                                                             (IDownloadProgress progress) =>
+                                                                             {
+                                                                                 switch (progress.Status)
+                                                                                 {
+                                                                                     case DownloadStatus.Downloading:
+                                                                                         {
+                                                                                             Console.WriteLine(progress.BytesDownloaded);
+                                                                                             logFile.WriteLine("Downloading: " + progress.BytesDownloaded);
+                                                                                             txtLog.Text += ("Downloading ... " + progress.BytesDownloaded + Environment.NewLine);
+                                                                                             logfile.WriteLine("[" + user + "] Download complete for: " + fileName + Environment.NewLine);
+                                                                                             scrolltobtm();
+                                                                                             logfile.Flush();
+                                                                                             logFile.Flush();
+                                                                                             break;
+                                                                                         }
+                                                                                     case DownloadStatus.Completed:
+                                                                                         {
+                                                                                             Console.WriteLine("Download complete.");
+                                                                                             logFile.WriteLine("[" + user + "] Download complete for: " + requestfileid.ToString());
+                                                                                             txtLog.Text += ("[" + user + "] Download complete for: " + fileName + Environment.NewLine);
+                                                                                             logfile.WriteLine("[" + user + "] Download complete for: " + fileName + Environment.NewLine);
+                                                                                             logFile.Flush();
+                                                                                             logfile.Flush();
+                                                                                             break;
+                                                                                         }
+                                                                                     case DownloadStatus.Failed:
+                                                                                         {
+                                                                                             Console.WriteLine("Download failed.");
+                                                                                             logFile.WriteLine("Download failed.");
+                                                                                             logFile.Flush();
+                                                                                             break;
+                                                                                         }
+                                                                                 }
+                                                                             };
+                                                                    scrolltobtm();
+                                                                    requestfileid.Download(stream1);
+                                                                    stream1.Close();
+                                                                    stream1.Dispose();
+                                                                }
+                                                                else
+                                                                {
+                                                                    scrolltobtm();
+                                                                    var requestfileid = CreateService.BuildService(user).Files.Get(fileId);
+                                                                    //Generate the name of the file, and create it as such on the local filesystem.
+                                                                    statusStripLabel1.Text = (savelocation + fileName + ext);
+                                                                    string dest1 = Path.Combine(savelocation, fileName + ext);
+                                                                    var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                                                                    Thread.Sleep(1000);
+                                                                    requestfileid.MediaDownloader.ProgressChanged +=
+                                                                             (IDownloadProgress progress) =>
+                                                                             {
+                                                                                 switch (progress.Status)
+                                                                                 {
+                                                                                     case DownloadStatus.Downloading:
+                                                                                         {
+                                                                                             Console.WriteLine(progress.BytesDownloaded);
+                                                                                             logFile.WriteLine("Downloading: " + progress.BytesDownloaded);
+                                                                                             txtLog.Text += ("Downloading ... " + progress.BytesDownloaded + Environment.NewLine);
+                                                                                             logfile.WriteLine("[" + user + "] Download complete for: " + fileName + Environment.NewLine);
+                                                                                             scrolltobtm();
+                                                                                             logFile.Flush();
+                                                                                             logfile.Flush();
+                                                                                             break;
+                                                                                         }
+                                                                                     case DownloadStatus.Completed:
+                                                                                         {
+                                                                                             Console.WriteLine("Download complete.");
+                                                                                             logFile.WriteLine("Download complete for: " + requestfileid.ToString());
+                                                                                             txtLog.Text += (Environment.NewLine + "[" + user + "] Download complete for: " + fileName + Environment.NewLine);
+                                                                                             logfile.WriteLine("[" + user + "] Download complete for: " + fileName + Environment.NewLine);
+                                                                                             logFile.Flush();
+                                                                                             logfile.Flush();
+                                                                                             break;
+                                                                                         }
+                                                                                     case DownloadStatus.Failed:
+                                                                                         {
+                                                                                             Console.WriteLine("Download failed.");
+                                                                                             logFile.WriteLine("Download failed.");
+                                                                                             logFile.Flush();
+                                                                                             break;
+                                                                                         }
+                                                                                 }
+                                                                             };
+                                                                    scrolltobtm();
+                                                                    requestfileid.Download(stream1);
+                                                                    stream1.Close();
+                                                                    stream1.Dispose();
 
-                                                                                        break;
-                                                                                    }
-                                                                                case DownloadStatus.Failed:
-                                                                                    {
-                                                                                        Console.WriteLine("Download failed.");
-                                                                                        logFile.WriteLine("Download failed.");
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                            }
-                                                                        };
-                                                                scrolltobtm();
-                                                                requestfileid.Download(stream1);
-                                                                stream1.Close();
-                                                                stream1.Dispose();
+                                                                }
                                                             }
-                                                            else
+                                                            catch (Google.GoogleApiException ex)
                                                             {
-                                                                scrolltobtm();
-                                                                var requestfileid = CreateService.BuildService(user).Files.Get(fileId);
-                                                                //Generate the name of the file, and create it as such on the local filesystem.
-                                                                statusStripLabel1.Text = (savelocation + fileName + ext);
-                                                                string dest1 = Path.Combine(savelocation, fileName + ext);
-                                                                var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                                                                requestfileid.MediaDownloader.ProgressChanged +=
-                                                                        (IDownloadProgress progress) =>
-                                                                        {
-                                                                            switch (progress.Status)
-                                                                            {
-                                                                                case DownloadStatus.Downloading:
-                                                                                    {
-                                                                                        Console.WriteLine(progress.BytesDownloaded);
-                                                                                        logFile.WriteLine("Downloading: " + progress.BytesDownloaded);
-                                                                                        btnSkipFile.Text += ("Downloading ... " + progress.BytesDownloaded + Environment.NewLine);
-                                                                                        scrolltobtm();
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                                case DownloadStatus.Completed:
-                                                                                    {
-                                                                                        Console.WriteLine("Download complete.");
-                                                                                        logFile.WriteLine("Download complete for: " + requestfileid.ToString());
-                                                                                        btnSkipFile.Text += (Environment.NewLine + "Download complete for: " + fileName + Environment.NewLine);
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                                case DownloadStatus.Failed:
-                                                                                    {
-
-                                                                                        Console.WriteLine("Download failed.");
-                                                                                        logFile.WriteLine("Download failed.");
-                                                                                        logFile.Flush();
-                                                                                        break;
-                                                                                    }
-                                                                            }
-                                                                        };
-                                                                scrolltobtm();
-                                                                requestfileid.Download(stream1);
-                                                                stream1.Close();
-                                                                stream1.Dispose();
+                                                                Console.Write("\nInfo: ---> " + ex.Message.ToString() + "\n");
                                                             }
-                                                        }
-                                                        catch (Google.GoogleApiException ex)
-                                                        {
-                                                            Console.Write("\nInfo: ---> " + ex.Message.ToString() + "\n");
                                                         }
                                                     }
+                                                    exfunctions.MoveFiles(savelocation);
+                                                    Console.WriteLine("\n\n\tBackup completed for selected user!");
+                                                    txtLog.Text += (Environment.NewLine + "\n\nBackup completed for selected " + user +"\n\n" + Environment.NewLine);
+                                                    statusStripLabel1.Text = "";
+                                                    btnStart.Text = "Start Backup!";
+                                                    logFile.Close();
+                                                    logFile.Dispose();
+
                                                 }
-                                                exfunctions.MoveFiles(savelocation);
-                                                Console.WriteLine("\n\n\tBackup completed for selected user!");
-                                                btnSkipFile.Text += ("\n\nBackup completed for selected user.\n\n");
-                                                statusStripLabel1.Text = "";
-                                                logFile.Close();
-                                                logFile.Dispose();
+
                                             }
+
                                         }
+                                        catch (Google.GoogleApiException ex)
+                                        {
+                                            Console.WriteLine("Info: " + ex.Message.ToString());
+                                        }
+                                        logfile.Flush();
 
                                     }
-                                    catch (Google.GoogleApiException ex)
-                                    {
-                                        Console.WriteLine("Info: " + ex.Message.ToString());
-                                    }
+                                );
+                                if (checkforfinished.IsCompleted == true)
+                                {
+                                    MessageBox.Show("Parallel.ForEach() Finished!");
+                                    Console.WriteLine("Parallel.ForEach() Finished!");
                                 }
+                                else
+                                {
+                                    MessageBox.Show("Parallel.ForEach() not completed!");
+                                    Console.WriteLine("Parallel.ForEach() not completed!");
+                                }
+                                logfile.Close();
                             }
+
                         }
                     }
                 }
@@ -542,6 +589,7 @@ namespace TuckerTech_GABackup_GUI
                     Console.WriteLine("Info: " + ex.Message.ToString());
                     //txtLog.Text += (Environment.NewLine);
                 }
+
             }
         }
 
@@ -838,10 +886,10 @@ namespace TuckerTech_GABackup_GUI
                 string googletype = null;
 
 
-                btnSkipFile.Text += ("Restoring File \"" + lstFiles.SelectedItems[0].Text + "\" to " + unonly + " root drive" + Environment.NewLine);
-                statusStripLabel1.Text = "Restoring "+lstFiles.SelectedItems[0].Text + " ... please wait.";
+                txtLog.Text += ("Restoring File \"" + lstFiles.SelectedItems[0].Text + "\" to " + unonly + " root drive" + Environment.NewLine);
+                statusStripLabel1.Text = "Restoring " + lstFiles.SelectedItems[0].Text + " ... please wait.";
                 Google.Apis.Drive.v3.Data.File fileMetadata = new Google.Apis.Drive.v3.Data.File();
-                fileMetadata.Name = lstFiles.SelectedItems[0].Text + "_RESTORE_"+rndfileadd;
+                fileMetadata.Name = lstFiles.SelectedItems[0].Text + "_RESTORE_" + rndfileadd;
                 switch (findext)
                 {
                     case "xlsx":
@@ -902,16 +950,16 @@ namespace TuckerTech_GABackup_GUI
                     request.Upload();
                 }
                 var file = request.ResponseBody;
-                btnSkipFile.Text += (lstFiles.SelectedItems[0].Text + " was successfully restored to " + unonly + "'s drive" + Environment.NewLine);
+                txtLog.Text += (lstFiles.SelectedItems[0].Text + " was successfully restored to " + unonly + "'s drive" + Environment.NewLine);
                 statusStripLabel1.Text = "File was successfully restored!";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Sorry, I don't support this action yet. I can only restore files.\n\n[Debug] Literal error is:\n" +ex.Message.ToString(),"Unsupported action",MessageBoxButtons.OK,MessageBoxIcon.Asterisk);
-                btnSkipFile.Text += Environment.NewLine + "Failed to restore file!" + Environment.NewLine;
+                MessageBox.Show("Sorry, I don't support this action yet. I can only restore files.\n\n[Debug] Literal error is:\n" + ex.Message.ToString(), "Unsupported action", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                txtLog.Text += Environment.NewLine + "Failed to restore file!" + Environment.NewLine;
             }
         }
-        
+
         private void btnStart_Click(object sender, EventArgs e)
         {
             Startitup();
@@ -969,8 +1017,8 @@ namespace TuckerTech_GABackup_GUI
 
         private void txtLog_TextChanged(object sender, EventArgs e)
         {
-            btnSkipFile.SelectionStart = btnSkipFile.Text.Length;
-            btnSkipFile.ScrollToCaret();
+            txtLog.SelectionStart = txtLog.Text.Length;
+            txtLog.ScrollToCaret();
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -1067,8 +1115,8 @@ namespace TuckerTech_GABackup_GUI
 
         private void scrolltobtm()
         {
-            btnSkipFile.SelectionStart = btnSkipFile.Text.Length;
-            btnSkipFile.ScrollToCaret();
+            txtLog.SelectionStart = txtLog.Text.Length;
+            txtLog.ScrollToCaret();
         }
 
         private void lblUnread_Click(object sender, EventArgs e)
@@ -1079,6 +1127,41 @@ namespace TuckerTech_GABackup_GUI
         private void metroButton1_Click(object sender, EventArgs e)
         {
             bgW.CancelAsync();
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            if (FormWindowState.Minimized == this.WindowState)
+            {
+                notifyTray.Visible = true;
+                //notifyTray.ShowBalloonTip(500);
+                this.Hide();
+            }
+            else if (FormWindowState.Normal == this.WindowState)
+            {
+                notifyTray.Visible = true;
+            }
+        }
+
+        private void notifyTray_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
+            notifyTray.Visible = false;
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
+            notifyTray.Visible = false;
         }
     }
 
@@ -1121,7 +1204,7 @@ namespace TuckerTech_GABackup_GUI
                 return null;
             }
 
-    }
+        }
 
     }
 

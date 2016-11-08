@@ -29,6 +29,7 @@ namespace TuckerTech_GABackup_GUI
             txtDefaultDomain.Text = ConfigurationManager.AppSettings["defaultdomain"];
             txtReplaceDomain.Text = ConfigurationManager.AppSettings["replacedomain"];
             txtBiggerThan.Text = ConfigurationManager.AppSettings["bigfiles"];
+            txtProcessors.Text = ConfigurationManager.AppSettings["multithread"];
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -123,8 +124,10 @@ namespace TuckerTech_GABackup_GUI
                 Configuration saveconfig = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
                 //Remove previous entries
                 saveconfig.AppSettings.Settings.Remove("bigfiles");
+                saveconfig.AppSettings.Settings.Remove("multithread");
                 //Save the entries
                 saveconfig.AppSettings.Settings.Add("bigfiles", txtBiggerThan.Text);
+                saveconfig.AppSettings.Settings.Add("multithread", txtProcessors.Text);
                 saveconfig.Save(ConfigurationSaveMode.Full, true);
                 ConfigurationManager.RefreshSection("appSettings");
                 stripLabel.Text = "Successfully saved settings!";
@@ -149,6 +152,11 @@ namespace TuckerTech_GABackup_GUI
         private void Preferences_Activated(object sender, EventArgs e)
         {
             ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void btnCancel_Click(object sender, MouseEventArgs e)
+        {
+            this.Close();
         }
     }
 }

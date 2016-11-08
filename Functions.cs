@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -15,6 +15,7 @@ namespace TuckerTech_GABackup_GUI
         Form1 sendtolog = new Form1();
         public static void CreateSubDir(string savelocation)
         {
+            Console.WriteLine("CREATING SUBDIR: " + savelocation);
             string directoryname = (savelocation + "folderlog.txt"); // Folder log created by the folder record f(x)
             string filename = (savelocation + ".deltalog.tok"); // The changed file list generated from changed files f(x)
             string filedirectory = (savelocation + ".folderlog.log"); // This is the new log file that will be created once the sub dirs are relocated.
@@ -24,14 +25,14 @@ namespace TuckerTech_GABackup_GUI
                         .Where(item => item.All(part => !string.IsNullOrWhiteSpace(part)))
                         .ToList();
 
-            var result = from a in lines
-                         from b in lines
+            var result = from a in lines.AsParallel()
+                         from b in lines.AsParallel()
                          where a[0] == b[2]
                          select new { a, b, };
 
             StreamWriter finaldir = new StreamWriter(filedirectory);
 
-            foreach (var x in result)
+           foreach (var x in result)
             {
                 try
                 {
@@ -48,11 +49,13 @@ namespace TuckerTech_GABackup_GUI
                     {
                         Directory.Move(savelocation + x.b[3], x.a[1] + x.b[3]);
                         Console.WriteLine("Moving sub directory: " + x.a[1] + x.b[3] + "\n");
+                        Thread.Sleep(100);
                         finaldir.WriteLine(x.b[2] + "," + x.a[1] + x.b[3] + "," + x.a[1] + "," + x.b[3] + "," + x.b[0]);
                     }
                     else
                     {
                         finaldir.Write(x.b[2] + "," + savelocation);
+                        Thread.Sleep(100);
                         Console.WriteLine("next...");
                     }
                 }
@@ -66,7 +69,6 @@ namespace TuckerTech_GABackup_GUI
             }
             finaldir.Flush();
             finaldir.Close();
-
         }
 
         public static void MoveFiles(string savelocation)
@@ -93,9 +95,9 @@ namespace TuckerTech_GABackup_GUI
                     .Where(item => item.All(part => !string.IsNullOrWhiteSpace(part)))
                     .ToList();
 
-            var movefile = from a in filedir    // folderlog.txt (created by folder record earlier)
-                           from b in filelines  // New / changed file .deltalog.tok file.
-                           from c in fulldirpath
+            var movefile = from a in filedir.AsParallel()    // folderlog.txt (created by folder record earlier)
+                           from b in filelines.AsParallel()  // New / changed file .deltalog.tok file.
+                           from c in fulldirpath.AsParallel()
                            where a[0] == b[3] && b[3] != null || b[3] != "" && c[0] != a[1] // where folderlog.txt's folderID is equal to deltalog.tok's folder ID
                            select new { a, b, c };
 
@@ -222,6 +224,7 @@ namespace TuckerTech_GABackup_GUI
                     x.a[1] = x.a[1].Replace('"', '\\');
                     if (x.b[3] == x.c[4])
                     {
+                        Thread.Sleep(100);
                         destfile = (x.c[1] + "\\" + x.b[1] + ext);
                         Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
                         File.Move(origfile, destfile);
@@ -229,6 +232,7 @@ namespace TuckerTech_GABackup_GUI
                     }
                     else if (x.a[0] == x.b[3])
                     {
+                        Thread.Sleep(100);
                         destfile = (x.a[1] + "\\" + x.b[1] + ext);
                         Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
                         File.Move(origfile, destfile);
@@ -248,8 +252,10 @@ namespace TuckerTech_GABackup_GUI
 
         public static void RecordFolderList(string savedStartPageToken, string pageToken, string user, string savelocation)
         {
+            
+            Console.WriteLine("RECORDFOLDERLIST(): " + savelocation);
             Form1 sendtolog = new Form1();
-            sendtolog.TxtLog = "Recording folders to file...";
+            //sendtolog.TxtLog = "Recording folders to file...";
             FilesResource.ListRequest request1 = null;
             StreamWriter folderlog = new StreamWriter(savelocation + "folderlog.txt", true);
             StreamWriter logFile = new StreamWriter(savelocation + ".recent.log");
@@ -276,12 +282,13 @@ namespace TuckerTech_GABackup_GUI
                         subfolder.Add(sendreq.Name);
                         foreach (string sub in subfolder)
                         {
+                            Thread.Sleep(100);
                             folderid = String.Join(",", change.Parents);
                             folderid = ("," + folderid + "," + sub.ToString());
                             string subreplace = sub.Replace(":", "_");
-                            Console.WriteLine("Creating directory: " + subreplace.ToString());
+                            Console.WriteLine("Creating directory: " + savelocation+subreplace.ToString());
                             updatedfile = subreplace.ToString();
-                            Directory.CreateDirectory(subreplace.ToString());
+                            Directory.CreateDirectory(savelocation+subreplace.ToString());
                         }
                     }
 
@@ -321,7 +328,6 @@ namespace TuckerTech_GABackup_GUI
             folderlog.Close();
             folderlog.Dispose();
             CreateSubDir(savelocation);
-
         }
         public static void ChangesFileList(string savedStartPageToken, string pageToken, string user, string savelocation)
         {
@@ -375,6 +381,10 @@ namespace TuckerTech_GABackup_GUI
                                     updatedfile = updatedfile.Replace(",", "_").Replace("\"", "_").Replace("(", "-").Replace(")", "-").Replace("?", "_").Replace("<", "_").Replace(">", "_").Replace(";", "_").Replace("$", "_").Replace("@", "_").Replace("!", "_").Replace("|", "_").Replace(":", "_");
                                     logFile.WriteLine(user + ": New or changed file found: " + change.FileId + " --- " + updatedfile);
                                     logFile.Flush();
+                                    if (updatedfile.Length >= 35)
+                                    {
+                                        updatedfile = (updatedfile.Substring(0,35) + "...");
+                                    }
                                     if (mimetype == "application/vnd.google-apps.folder")
                                     {
                                         //
@@ -382,6 +392,7 @@ namespace TuckerTech_GABackup_GUI
 
                                     else
                                     {
+                                        Thread.Sleep(100);
                                         deltalog.WriteLine(change.FileId + "," + updatedfile + "," + mimetype + "," + folderid);
                                         deltalog.Flush();
                                     }
@@ -457,7 +468,6 @@ namespace TuckerTech_GABackup_GUI
             this.Text = "TTO: Google Drive Backup";
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
     }
 

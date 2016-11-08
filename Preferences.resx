@@ -135,6 +135,19 @@ Typically used for instances where you'd want TTO's GSuite backup tool to automa
 what you would expect to see from your GSuite admin console. Go ahead, give it a try!
 </value>
   </data>
+  <data name="lblMultithread.ToolTip" xml:space="preserve">
+    <value>[BETA] Speed up backup performance significantly.
+This is a thoroughly untested feature as of ver .085a.
+
+Enter a numbe percentage of your system resources
+that you wish to allocate this program to use.
+
+I found some stability issues when I went above 4 cores
+on an 8 core PC. Only available on an x64 arch!
+
+But if you like to live dangerously, feel free to go higher.
+</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

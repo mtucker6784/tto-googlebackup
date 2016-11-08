@@ -56,7 +56,7 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.metroTabControl1 = new MetroFramework.Controls.MetroTabControl();
             this.tabBackup = new System.Windows.Forms.TabPage();
-            this.btnSkipFile = new System.Windows.Forms.TextBox();
+            this.txtLog = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.metroButton1 = new MetroFramework.Controls.MetroButton();
             this.btnSkipUser = new System.Windows.Forms.Button();
@@ -95,6 +95,11 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.miniToolStrip = new System.Windows.Forms.MenuStrip();
+            this.notifyTray = new System.Windows.Forms.NotifyIcon(this.components);
+            this.conNotifyTray = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.statusStrip1.SuspendLayout();
             this.conMenuStrip.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
@@ -109,6 +114,7 @@
             this.tabEmail.SuspendLayout();
             this.panel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.conNotifyTray.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -250,7 +256,7 @@
             // 
             // btnPref
             // 
-            this.btnPref.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.btnPref.BackColor = System.Drawing.Color.WhiteSmoke;
             this.btnPref.Image = ((System.Drawing.Image)(resources.GetObject("btnPref.Image")));
             this.btnPref.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnPref.Location = new System.Drawing.Point(390, 3);
@@ -263,7 +269,7 @@
             // 
             // btnStart
             // 
-            this.btnStart.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.btnStart.BackColor = System.Drawing.Color.WhiteSmoke;
             this.btnStart.Image = ((System.Drawing.Image)(resources.GetObject("btnStart.Image")));
             this.btnStart.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnStart.Location = new System.Drawing.Point(261, 3);
@@ -276,7 +282,7 @@
             // 
             // buttonAdv1
             // 
-            this.buttonAdv1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.buttonAdv1.BackColor = System.Drawing.Color.WhiteSmoke;
             this.buttonAdv1.Image = ((System.Drawing.Image)(resources.GetObject("buttonAdv1.Image")));
             this.buttonAdv1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.buttonAdv1.Location = new System.Drawing.Point(132, 3);
@@ -289,7 +295,7 @@
             // 
             // btnBrowse
             // 
-            this.btnBrowse.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.btnBrowse.BackColor = System.Drawing.Color.WhiteSmoke;
             this.btnBrowse.Image = ((System.Drawing.Image)(resources.GetObject("btnBrowse.Image")));
             this.btnBrowse.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnBrowse.Location = new System.Drawing.Point(3, 3);
@@ -334,14 +340,14 @@
             this.metroTabControl1.Location = new System.Drawing.Point(7, 5);
             this.metroTabControl1.Multiline = true;
             this.metroTabControl1.Name = "metroTabControl1";
-            this.metroTabControl1.SelectedIndex = 1;
+            this.metroTabControl1.SelectedIndex = 0;
             this.metroTabControl1.Size = new System.Drawing.Size(800, 531);
             this.metroTabControl1.TabIndex = 41;
             this.metroTabControl1.UseSelectable = true;
             // 
             // tabBackup
             // 
-            this.tabBackup.Controls.Add(this.btnSkipFile);
+            this.tabBackup.Controls.Add(this.txtLog);
             this.tabBackup.Controls.Add(this.panel1);
             this.tabBackup.Controls.Add(this.lstBackupUsers);
             this.tabBackup.Location = new System.Drawing.Point(4, 41);
@@ -350,21 +356,21 @@
             this.tabBackup.TabIndex = 0;
             this.tabBackup.Text = "Backup";
             // 
-            // btnSkipFile
+            // txtLog
             // 
-            this.btnSkipFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSkipFile.BackColor = System.Drawing.Color.White;
-            this.btnSkipFile.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.btnSkipFile.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.btnSkipFile.Location = new System.Drawing.Point(177, 184);
-            this.btnSkipFile.Multiline = true;
-            this.btnSkipFile.Name = "btnSkipFile";
-            this.btnSkipFile.ReadOnly = true;
-            this.btnSkipFile.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.btnSkipFile.Size = new System.Drawing.Size(615, 290);
-            this.btnSkipFile.TabIndex = 57;
+            this.txtLog.BackColor = System.Drawing.Color.White;
+            this.txtLog.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.txtLog.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.txtLog.Location = new System.Drawing.Point(177, 184);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtLog.Size = new System.Drawing.Size(615, 296);
+            this.txtLog.TabIndex = 57;
             // 
             // panel1
             // 
@@ -393,6 +399,7 @@
             this.metroButton1.TabIndex = 52;
             this.metroButton1.Text = "Skip &File";
             this.metroButton1.UseSelectable = true;
+            this.metroButton1.Visible = false;
             this.metroButton1.Click += new System.EventHandler(this.metroButton1_Click);
             // 
             // btnSkipUser
@@ -403,6 +410,7 @@
             this.btnSkipUser.TabIndex = 51;
             this.btnSkipUser.Text = "&Skip User";
             this.btnSkipUser.UseVisualStyleBackColor = true;
+            this.btnSkipUser.Visible = false;
             // 
             // lblProgresslbl
             // 
@@ -420,6 +428,7 @@
             this.lblCurrentToken.Size = new System.Drawing.Size(90, 19);
             this.lblCurrentToken.TabIndex = 25;
             this.lblCurrentToken.Text = "Current Token";
+            this.lblCurrentToken.Visible = false;
             // 
             // txtCurrentToken
             // 
@@ -429,6 +438,7 @@
             this.txtCurrentToken.ReadOnly = true;
             this.txtCurrentToken.Size = new System.Drawing.Size(82, 20);
             this.txtCurrentToken.TabIndex = 24;
+            this.txtCurrentToken.Visible = false;
             // 
             // lblPrevToken
             // 
@@ -438,6 +448,7 @@
             this.lblPrevToken.Size = new System.Drawing.Size(68, 19);
             this.lblPrevToken.TabIndex = 23;
             this.lblPrevToken.Text = "Last Token";
+            this.lblPrevToken.Visible = false;
             // 
             // proUser
             // 
@@ -446,6 +457,7 @@
             this.proUser.Name = "proUser";
             this.proUser.Size = new System.Drawing.Size(168, 23);
             this.proUser.TabIndex = 50;
+            this.proUser.Visible = false;
             // 
             // txtPrevToken
             // 
@@ -455,6 +467,7 @@
             this.txtPrevToken.ReadOnly = true;
             this.txtPrevToken.Size = new System.Drawing.Size(82, 20);
             this.txtPrevToken.TabIndex = 22;
+            this.txtPrevToken.Visible = false;
             // 
             // lblCurrentUser
             // 
@@ -500,9 +513,9 @@
             this.tabRestore.Controls.Add(this.tabControlAdv1);
             this.tabRestore.Controls.Add(this.lblUserTitle);
             this.tabRestore.Controls.Add(this.listBox1);
-            this.tabRestore.Location = new System.Drawing.Point(4, 41);
+            this.tabRestore.Location = new System.Drawing.Point(4, 38);
             this.tabRestore.Name = "tabRestore";
-            this.tabRestore.Size = new System.Drawing.Size(792, 486);
+            this.tabRestore.Size = new System.Drawing.Size(792, 489);
             this.tabRestore.TabIndex = 1;
             this.tabRestore.Text = "View and Restore";
             // 
@@ -517,7 +530,7 @@
             this.tabControlAdv1.Name = "tabControlAdv1";
             this.tabControlAdv1.Padding = new System.Drawing.Point(63, 3);
             this.tabControlAdv1.SelectedIndex = 0;
-            this.tabControlAdv1.Size = new System.Drawing.Size(521, 480);
+            this.tabControlAdv1.Size = new System.Drawing.Size(521, 459);
             this.tabControlAdv1.TabIndex = 53;
             // 
             // tabPageAdv1
@@ -525,7 +538,7 @@
             this.tabPageAdv1.Controls.Add(this.lstFiles);
             this.tabPageAdv1.Location = new System.Drawing.Point(4, 22);
             this.tabPageAdv1.Name = "tabPageAdv1";
-            this.tabPageAdv1.Size = new System.Drawing.Size(513, 454);
+            this.tabPageAdv1.Size = new System.Drawing.Size(513, 433);
             this.tabPageAdv1.TabIndex = 1;
             this.tabPageAdv1.Text = "Drive";
             // 
@@ -546,7 +559,7 @@
             this.lstFiles.MultiSelect = false;
             this.lstFiles.Name = "lstFiles";
             this.lstFiles.OwnerDraw = true;
-            this.lstFiles.Size = new System.Drawing.Size(513, 454);
+            this.lstFiles.Size = new System.Drawing.Size(513, 433);
             this.lstFiles.TabIndex = 2;
             this.lstFiles.UseCompatibleStateImageBehavior = false;
             this.lstFiles.UseSelectable = true;
@@ -577,7 +590,7 @@
             this.tabEmail.Location = new System.Drawing.Point(4, 22);
             this.tabEmail.Name = "tabEmail";
             this.tabEmail.Padding = new System.Windows.Forms.Padding(3);
-            this.tabEmail.Size = new System.Drawing.Size(513, 457);
+            this.tabEmail.Size = new System.Drawing.Size(513, 433);
             this.tabEmail.TabIndex = 2;
             this.tabEmail.Text = "Email";
             this.tabEmail.UseVisualStyleBackColor = true;
@@ -603,7 +616,7 @@
             this.lstGmail.Location = new System.Drawing.Point(105, 0);
             this.lstGmail.Name = "lstGmail";
             this.lstGmail.OwnerDraw = true;
-            this.lstGmail.Size = new System.Drawing.Size(405, 149);
+            this.lstGmail.Size = new System.Drawing.Size(405, 146);
             this.lstGmail.TabIndex = 3;
             this.lstGmail.UseCompatibleStateImageBehavior = false;
             this.lstGmail.UseSelectable = true;
@@ -656,7 +669,7 @@
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(0, 0);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(268, 486);
+            this.listBox1.Size = new System.Drawing.Size(268, 489);
             this.listBox1.TabIndex = 39;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
@@ -685,6 +698,7 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.BackColor = System.Drawing.Color.Transparent;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
@@ -741,6 +755,40 @@
             this.miniToolStrip.Size = new System.Drawing.Size(812, 24);
             this.miniToolStrip.TabIndex = 56;
             // 
+            // notifyTray
+            // 
+            this.notifyTray.ContextMenuStrip = this.conNotifyTray;
+            this.notifyTray.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyTray.Icon")));
+            this.notifyTray.Text = "TTO GSuite Bkup";
+            this.notifyTray.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyTray_MouseDoubleClick);
+            // 
+            // conNotifyTray
+            // 
+            this.conNotifyTray.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem1,
+            this.toolStripMenuItem2});
+            this.conNotifyTray.Name = "conNotifyTray";
+            this.conNotifyTray.Size = new System.Drawing.Size(114, 48);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(113, 22);
+            this.toolStripMenuItem1.Text = "Restore";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(113, 22);
+            this.toolStripMenuItem2.Text = "Exit";
+            this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
+            // 
+            // contextMenuStrip2
+            // 
+            this.contextMenuStrip2.Name = "contextMenuStrip2";
+            this.contextMenuStrip2.Size = new System.Drawing.Size(61, 4);
+            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -756,8 +804,9 @@
             this.Name = "Form1";
             this.Padding = new System.Windows.Forms.Padding(1, 60, 1, 1);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "TT: Google Drive Backup";
+            this.Text = "TTO: Google Drive Backup";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.Resize += new System.EventHandler(this.Form1_Resize);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.conMenuStrip.ResumeLayout(false);
@@ -780,6 +829,7 @@
             this.panel2.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.conNotifyTray.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -812,7 +862,7 @@
         private System.Windows.Forms.Panel panel3;
         private MetroFramework.Controls.MetroTabControl metroTabControl1;
         private System.Windows.Forms.TabPage tabBackup;
-        private System.Windows.Forms.TextBox btnSkipFile;
+        private System.Windows.Forms.TextBox txtLog;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnSkipUser;
         private MetroFramework.Controls.MetroLabel lblProgresslbl;
@@ -851,6 +901,11 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private MetroFramework.Controls.MetroButton metroButton1;
+        private System.Windows.Forms.NotifyIcon notifyTray;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip2;
+        private System.Windows.Forms.ContextMenuStrip conNotifyTray;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
     }
 }
 

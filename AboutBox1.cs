@@ -106,5 +106,10 @@ namespace TuckerTech_GABackup_GUI
         {
             this.Close();
         }
+
+        private void AboutBox1_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
