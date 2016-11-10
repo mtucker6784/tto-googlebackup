@@ -369,7 +369,7 @@
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(615, 296);
+            this.txtLog.Size = new System.Drawing.Size(615, 302);
             this.txtLog.TabIndex = 57;
             // 
             // panel1
