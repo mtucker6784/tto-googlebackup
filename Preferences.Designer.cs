@@ -361,7 +361,7 @@
             this.txtProcessors.CustomButton.UseSelectable = true;
             this.txtProcessors.CustomButton.Visible = false;
             this.txtProcessors.Lines = new string[0];
-            this.txtProcessors.Location = new System.Drawing.Point(292, 49);
+            this.txtProcessors.Location = new System.Drawing.Point(185, 49);
             this.txtProcessors.MaxLength = 32767;
             this.txtProcessors.Name = "txtProcessors";
             this.txtProcessors.PasswordChar = '\0';
@@ -384,9 +384,9 @@
             this.lblMultithread.AutoSize = true;
             this.lblMultithread.Location = new System.Drawing.Point(16, 49);
             this.lblMultithread.Name = "lblMultithread";
-            this.lblMultithread.Size = new System.Drawing.Size(276, 19);
+            this.lblMultithread.Size = new System.Drawing.Size(163, 19);
             this.lblMultithread.TabIndex = 16;
-            this.lblMultithread.Text = "Resources (by percent) for backup dedication:";
+            this.lblMultithread.Text = "Number of threads to use:";
             this.tipBiggerThan.SetToolTip(this.lblMultithread, resources.GetString("lblMultithread.ToolTip"));
             // 
             // btnSaveMB
@@ -402,7 +402,7 @@
             // metroLabel2
             // 
             this.metroLabel2.AutoSize = true;
-            this.metroLabel2.Location = new System.Drawing.Point(460, 16);
+            this.metroLabel2.Location = new System.Drawing.Point(352, 20);
             this.metroLabel2.Name = "metroLabel2";
             this.metroLabel2.Size = new System.Drawing.Size(29, 19);
             this.metroLabel2.TabIndex = 4;
@@ -424,7 +424,7 @@
             this.txtBiggerThan.CustomButton.UseSelectable = true;
             this.txtBiggerThan.CustomButton.Visible = false;
             this.txtBiggerThan.Lines = new string[0];
-            this.txtBiggerThan.Location = new System.Drawing.Point(292, 16);
+            this.txtBiggerThan.Location = new System.Drawing.Point(185, 16);
             this.txtBiggerThan.MaxLength = 32767;
             this.txtBiggerThan.Name = "txtBiggerThan";
             this.txtBiggerThan.PasswordChar = '\0';
