@@ -134,7 +134,7 @@ namespace TuckerTech_GABackup_GUI
                                 var opts = new ParallelOptions { MaxDegreeOfParallelism = 1 };
                                 if (Environment.Is64BitOperatingSystem == true) // x64, let's use all our set preference instead.
                                 {
-                                    opts = new ParallelOptions { MaxDegreeOfParallelism = lstBackupUsers.Items.Count };
+                                    opts = new ParallelOptions { MaxDegreeOfParallelism = totalresource };
                                 }
                                 int arraycount = 0;
                                 var curIndex = 0;
@@ -218,18 +218,18 @@ namespace TuckerTech_GABackup_GUI
                                                     // Damnit Google, why did you change how the change fields work?
                                                     if (savedStartPageToken == "1")
                                                     {
-                                                        statusStripLabel1.Text = "Recording folder list ...";
+                                                        //statusStripLabel1.Text = "Recording folder list ...";
                                                         txtLog.Text = "Recording folder list ..." + Environment.NewLine;
                                                         logfile.WriteLine(user + " --- Recording folder list..." + Environment.NewLine);
                                                         exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
-                                                        statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
+                                                        //statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
                                                         txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
                                                         exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
                                                     }
                                                     else
                                                     {
                                                         //proUserclass = proUser;
-                                                        statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
+                                                        //statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
                                                         txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
                                                         exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
                                                     }
@@ -444,7 +444,7 @@ namespace TuckerTech_GABackup_GUI
                                                                     }
 
                                                                     var requestfileid = CreateService.BuildService(user).Files.Export(fileId, whatami);
-                                                                    statusStripLabel1.Text = (savelocation + fileName + ext);
+                                                                    //statusStripLabel1.Text = (savelocation + fileName + ext);
                                                                     txtCurrentUser.Text = user;
                                                                     string dest1 = Path.Combine(savelocation, fileName + ext);
                                                                     var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
@@ -495,7 +495,7 @@ namespace TuckerTech_GABackup_GUI
                                                                     scrolltobtm();
                                                                     var requestfileid = CreateService.BuildService(user).Files.Get(fileId);
                                                                     //Generate the name of the file, and create it as such on the local filesystem.
-                                                                    statusStripLabel1.Text = (savelocation + fileName + ext);
+                                                                    //statusStripLabel1.Text = (savelocation + fileName + ext);
                                                                     string dest1 = Path.Combine(savelocation, fileName + ext);
                                                                     var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                                                                     Thread.Sleep(1000);
@@ -550,7 +550,7 @@ namespace TuckerTech_GABackup_GUI
                                                     exfunctions.MoveFiles(savelocation);
                                                     Console.WriteLine("\n\n\tBackup completed for selected user!");
                                                     txtLog.Text += (Environment.NewLine + "\n\nBackup completed for selected " + user +"\n\n" + Environment.NewLine);
-                                                    statusStripLabel1.Text = "";
+                                                    //statusStripLabel1.Text = "";
                                                     btnStart.Text = "Start Backup!";
                                                     logFile.Close();
                                                     logFile.Dispose();
@@ -607,7 +607,7 @@ namespace TuckerTech_GABackup_GUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            exfunctions sample = new exfunctions();
+            //exfunctions sample = new exfunctions();
             listusers();
         }
         void listusers()
