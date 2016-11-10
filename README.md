@@ -2,6 +2,8 @@
 # Tucker Tech's Google Apps Drive Backup (TTO-GDB)
 
 [![Join the chat at https://gitter.im/mtucker6784/tto-googlebackup](https://badges.gitter.im/mtucker6784/tto-googlebackup.svg)](https://gitter.im/mtucker6784/tto-googlebackup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Stories in Ready](https://badge.waffle.io/mtucker6784/tto-googlebackup.png?label=ready&title=Ready)](https://waffle.io/mtucker6784/tto-googlebackup)
+
 Tucker Tech's Free Google Apps Drive backup utility (TT-GDB) --- C# Drive API v3
 
 Backup tool for backing up Google Apps Drive environments. This uses the Drive API v3 and C# (.net 4.5)
