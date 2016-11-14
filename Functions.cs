@@ -72,7 +72,9 @@ namespace TuckerTech_GABackup_GUI
 
         public static void MoveFiles(string savelocation)
         {
-            string directoryname = (savelocation + "folderlog.txt");    // Folder log created by the folder record f(x)
+            try
+            {
+                string directoryname = (savelocation + "folderlog.txt");    // Folder log created by the folder record f(x)
             string filename = (savelocation + ".deltalog.tok");         // The changed file list generated from changed files f(x)
             string filedirectory = (savelocation + ".folderlog.log");   // This is the new log file that will be created once the sub dirs are relocated.
             string ext = null;
@@ -99,13 +101,14 @@ namespace TuckerTech_GABackup_GUI
                            from c in fulldirpath.AsParallel()
                            where a[0] == b[3] && b[3] != null || b[3] != "" && c[0] != a[1] // where folderlog.txt's folderID is equal to deltalog.tok's folder ID
                            select new { a, b, c };
+            
 
             // Move files to the correct folders
+
             Console.WriteLine("Time to move files");
-            foreach (var x in movefile)
+                if (movefile.Any())
+                    foreach (var x in movefile)
             {
-                try
-                {
                     switch (x.b[2])
                     {
                         case "application/pdf":
@@ -237,21 +240,23 @@ namespace TuckerTech_GABackup_GUI
                     }
                     else
                     {
-                        //Console.WriteLine("Next!\n");
+                        Console.WriteLine("No dir/files match(es) found.");
                     }
                 }
-                catch (IOException ex)
-                {
-                    Console.WriteLine("Error: " + ex.Message.ToString() + " Status: Carrying on");
-                }
+
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("Error: " + ex.Message.ToString() + " Status: Carrying on");
             }
         }
-
         public static void RecordFolderList(string savedStartPageToken, string pageToken, string user, string savelocation)
         {
             
             Console.WriteLine("RECORDFOLDERLIST(): " + savelocation);
-            Form1 sendtolog = new Form1();
+            if (File.Exists(savelocation + "folderlog.txt"))
+                File.Delete(savelocation + "folderlog.txt");
+            //Form1 sendtolog = new Form1();
             //sendtolog.TxtLog = "Recording folders to file...";
             FilesResource.ListRequest request1 = null;
             StreamWriter folderlog = new StreamWriter(savelocation + "folderlog.txt", true);
@@ -261,7 +266,7 @@ namespace TuckerTech_GABackup_GUI
             request1.Q = @"mimeType='application/vnd.google-apps.folder'";
             request1.Fields = "files";
             request1.Spaces = "drive";
-            request1.PageSize = 1000;
+            request1.PageSize = 500;
             var changes = request1.Execute();
             foreach (var change in changes.Files)
             {
