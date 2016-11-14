@@ -108,10 +108,7 @@ namespace TuckerTech_GABackup_GUI
                     CheckForIllegalCrossThreadCalls = false;
                     var appSettings = ConfigurationManager.AppSettings;
                     string checkreplace = ConfigurationManager.AppSettings["checkreplace"];
-
                     string userfile = txtFile.Text;
-                    int counter = 0;
-
 
                     if (bgW.CancellationPending)
                     {
@@ -120,13 +117,11 @@ namespace TuckerTech_GABackup_GUI
                     }
                     else
                     {
-                        for (int z = 0; z >= counter; z++)
-                        {
+
                             if (bgW.CancellationPending)
                             {
                                 e.Cancel = true;
                                 stripLabel.Text = "Operation was canceled!";
-                                break;
                             }
                             else
                             {
@@ -141,7 +136,6 @@ namespace TuckerTech_GABackup_GUI
                                 int usercount = lstBackupUsers.Items.Count;
                                 string curdate = DateTime.Now.Month.ToString() + "-" + DateTime.Now.Day.ToString() + "-" + DateTime.Now.Hour.ToString() + "." + DateTime.Now.Minute.ToString() +"."+ DateTime.Now.Second.ToString();
                                 StreamWriter logfile = new StreamWriter(Environment.CurrentDirectory+"\\Logs\\MasterLogFile_"+curdate+".log",true);
-
                                 var checkforfinished = Parallel.ForEach(lstBackupUsers.Items.Cast<ListViewItem>(), opts, name =>
                                     {
                                     try
@@ -154,7 +148,6 @@ namespace TuckerTech_GABackup_GUI
                                             lstBackupUsers.Items[name.Index].BackColor = Color.CornflowerBlue;
                                             curIndex = Interlocked.Increment(ref arraycount);
                                             stripLabel.Text = "";
-                                            counter++;
                                             Console.WriteLine("Selecting user: " + names.ToString());
                                             txtLog.Text += "Selecting user: " + names.ToString() + Environment.NewLine;
                                             logfile.WriteLine("Selecting user: " + names.ToString() + Environment.NewLine);
@@ -200,14 +193,14 @@ namespace TuckerTech_GABackup_GUI
                                             if (gtoken <= 10)
                                             {
                                             Console.WriteLine("Nothing to save!\n" + Environment.NewLine);
-                                                //txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
+                                            txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
                                             }
                                             else
                                             {
                                                 if (pageToken == start.StartPageTokenValue)
                                                 {
                                                     Console.WriteLine("No file changes found for " + user + "\n" + Environment.NewLine);
-                                                    //txtLog.Text += ("No file changes found! Please wait while I tidy up." + Environment.NewLine);
+                                                    txtLog.Text += ("No file changes found! Next!" + Environment.NewLine);
                                                 }
                                                 else
                                                 {
@@ -231,6 +224,7 @@ namespace TuckerTech_GABackup_GUI
                                                         //proUserclass = proUser;
                                                         //statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
                                                         txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
+                                                        exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
                                                         exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
                                                     }
 
@@ -290,14 +284,10 @@ namespace TuckerTech_GABackup_GUI
                                                                 string fileId = values[0];
                                                                 string fileName = values[1];
                                                                 string mimetype = values[2];
-                                                                mimetype = mimetype.Replace(",", "_");
                                                                 string folder = values[3];
                                                                 string ext = null;
-
-                                                                int folderfilelen = foldervalues.Count();
-
+                                                                mimetype = mimetype.Replace(",", "_");
                                                                 fileName = GetSafeFilename(fileName);
-
                                                                 Console.WriteLine("Filename: " + values[1]);
                                                                 logFile.WriteLine("ID: " + values[0] + " - Filename: " + values[1]);
                                                                 logFile.Flush();
@@ -449,7 +439,7 @@ namespace TuckerTech_GABackup_GUI
                                                                     string dest1 = Path.Combine(savelocation, fileName + ext);
                                                                     var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                                                                     scrolltobtm();
-                                                                    Thread.Sleep(1000);
+                                                                    Thread.Sleep(300);
                                                                     requestfileid.MediaDownloader.ProgressChanged +=
                                                                              (IDownloadProgress progress) =>
                                                                              {
@@ -498,7 +488,7 @@ namespace TuckerTech_GABackup_GUI
                                                                     //statusStripLabel1.Text = (savelocation + fileName + ext);
                                                                     string dest1 = Path.Combine(savelocation, fileName + ext);
                                                                     var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                                                                    Thread.Sleep(1000);
+                                                                    Thread.Sleep(500);
                                                                     requestfileid.MediaDownloader.ProgressChanged +=
                                                                              (IDownloadProgress progress) =>
                                                                              {
@@ -541,7 +531,7 @@ namespace TuckerTech_GABackup_GUI
 
                                                                 }
                                                             }
-                                                            catch (Google.GoogleApiException ex)
+                                                            catch (Exception ex)
                                                             {
                                                                 Console.Write("\nInfo: ---> " + ex.Message.ToString() + "\n");
                                                             }
@@ -552,20 +542,16 @@ namespace TuckerTech_GABackup_GUI
                                                     txtLog.Text += (Environment.NewLine + "\n\nBackup completed for selected " + user +"\n\n" + Environment.NewLine);
                                                     //statusStripLabel1.Text = "";
                                                     btnStart.Text = "Start Backup!";
+                                                    logfile.Flush();
                                                     logFile.Close();
                                                     logFile.Dispose();
-
                                                 }
-
                                             }
-
                                         }
                                         catch (Google.GoogleApiException ex)
                                         {
                                             Console.WriteLine("Info: " + ex.Message.ToString());
                                         }
-                                        logfile.Flush();
-
                                     }
                                 );
                                 if (checkforfinished.IsCompleted == true)
@@ -580,9 +566,7 @@ namespace TuckerTech_GABackup_GUI
                                 }
                                 logfile.Close();
                             }
-
                         }
-                    }
                 }
                 catch (Google.GoogleApiException ex)
                 {
@@ -1163,7 +1147,11 @@ namespace TuckerTech_GABackup_GUI
             this.ShowInTaskbar = true;
             notifyTray.Visible = false;
         }
+
+
     }
+
+
 
     public class CreateService
     {
