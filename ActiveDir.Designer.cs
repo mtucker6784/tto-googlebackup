@@ -38,6 +38,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.btnOK = new System.Windows.Forms.Button();
+            this.chkAllAD = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -48,9 +49,9 @@
             this.colAttr,
             this.colVal});
             this.lstOUs.FullRowSelect = true;
-            this.lstOUs.Location = new System.Drawing.Point(12, 53);
+            this.lstOUs.Location = new System.Drawing.Point(12, 99);
             this.lstOUs.Name = "lstOUs";
-            this.lstOUs.Size = new System.Drawing.Size(487, 402);
+            this.lstOUs.Size = new System.Drawing.Size(487, 356);
             this.lstOUs.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.lstOUs.TabIndex = 1;
             this.lstOUs.UseCompatibleStateImageBehavior = false;
@@ -88,7 +89,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -117,11 +118,23 @@
             this.btnOK.UseVisualStyleBackColor = true;
             this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
             // 
+            // chkAllAD
+            // 
+            this.chkAllAD.AutoSize = true;
+            this.chkAllAD.Location = new System.Drawing.Point(12, 49);
+            this.chkAllAD.Name = "chkAllAD";
+            this.chkAllAD.Size = new System.Drawing.Size(306, 17);
+            this.chkAllAD.TabIndex = 5;
+            this.chkAllAD.Text = "Get all users from my specified Active Directory organization";
+            this.chkAllAD.UseVisualStyleBackColor = true;
+            this.chkAllAD.CheckStateChanged += new System.EventHandler(this.chkAllAD_CheckStateChanged);
+            // 
             // ActiveDir
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(511, 543);
+            this.Controls.Add(this.chkAllAD);
             this.Controls.Add(this.btnOK);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.lstOUs);
@@ -150,5 +163,6 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
+        private System.Windows.Forms.CheckBox chkAllAD;
     }
 }

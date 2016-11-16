@@ -56,9 +56,15 @@ namespace TuckerTech_GABackup_GUI
         {
             try
             {
-                if (this.ReturnValue1 == null || this.ReturnValue1 == "0")
-                    return;
-                this.ReturnValue1 = lstOUs.SelectedItems[0].SubItems[1].Text;
+                if (this.ReturnValue1 == null || this.ReturnValue1 == "0" && chkAllAD.Checked==false)
+                    this.Close();
+                if (chkAllAD.Checked)
+                {
+                    this.ReturnValue1 = "usead";
+                    this.Close();
+                }
+                else
+                    this.ReturnValue1 = lstOUs.SelectedItems[0].SubItems[1].Text;
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
@@ -78,6 +84,14 @@ namespace TuckerTech_GABackup_GUI
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void chkAllAD_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (chkAllAD.Checked == true)
+                lstOUs.Enabled = false;
+            else
+                lstOUs.Enabled = true;
         }
     }
 }
