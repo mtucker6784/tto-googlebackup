@@ -48,7 +48,7 @@ namespace TuckerTech_GABackup_GUI
                 saveconfig.AppSettings.Settings.Add("savelocation", txtSaveLocation.Text);
                 saveconfig.AppSettings.Settings.Add("defaultdomain", txtDefaultDomain.Text);
                 saveconfig.AppSettings.Settings.Add("replacedomain", txtReplaceDomain.Text);
-                saveconfig.Save(ConfigurationSaveMode.Full, true);
+                saveconfig.Save(ConfigurationSaveMode.Modified,true);
                 ConfigurationManager.RefreshSection("appSettings");
                 stripLabel.Text = "Successfully saved settings! Please restart this program.";
             }
@@ -128,7 +128,7 @@ namespace TuckerTech_GABackup_GUI
                 //Save the entries
                 saveconfig.AppSettings.Settings.Add("bigfiles", txtBiggerThan.Text);
                 saveconfig.AppSettings.Settings.Add("multithread", txtProcessors.Text);
-                saveconfig.Save(ConfigurationSaveMode.Full, true);
+                saveconfig.Save(ConfigurationSaveMode.Modified, true);
                 ConfigurationManager.RefreshSection("appSettings");
                 stripLabel.Text = "Successfully saved settings!";
 
@@ -155,6 +155,11 @@ namespace TuckerTech_GABackup_GUI
         }
 
         private void btnCancel_Click(object sender, MouseEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
         {
             this.Close();
         }

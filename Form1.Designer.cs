@@ -100,6 +100,7 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip2 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.bgwAD = new System.ComponentModel.BackgroundWorker();
             this.statusStrip1.SuspendLayout();
             this.conMenuStrip.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
@@ -428,7 +429,6 @@
             this.lblCurrentToken.Size = new System.Drawing.Size(90, 19);
             this.lblCurrentToken.TabIndex = 25;
             this.lblCurrentToken.Text = "Current Token";
-            this.lblCurrentToken.Visible = false;
             // 
             // txtCurrentToken
             // 
@@ -438,7 +438,6 @@
             this.txtCurrentToken.ReadOnly = true;
             this.txtCurrentToken.Size = new System.Drawing.Size(82, 20);
             this.txtCurrentToken.TabIndex = 24;
-            this.txtCurrentToken.Visible = false;
             // 
             // lblPrevToken
             // 
@@ -448,7 +447,6 @@
             this.lblPrevToken.Size = new System.Drawing.Size(68, 19);
             this.lblPrevToken.TabIndex = 23;
             this.lblPrevToken.Text = "Last Token";
-            this.lblPrevToken.Visible = false;
             // 
             // proUser
             // 
@@ -467,7 +465,6 @@
             this.txtPrevToken.ReadOnly = true;
             this.txtPrevToken.Size = new System.Drawing.Size(82, 20);
             this.txtPrevToken.TabIndex = 22;
-            this.txtPrevToken.Visible = false;
             // 
             // lblCurrentUser
             // 
@@ -513,9 +510,9 @@
             this.tabRestore.Controls.Add(this.tabControlAdv1);
             this.tabRestore.Controls.Add(this.lblUserTitle);
             this.tabRestore.Controls.Add(this.listBox1);
-            this.tabRestore.Location = new System.Drawing.Point(4, 38);
+            this.tabRestore.Location = new System.Drawing.Point(4, 41);
             this.tabRestore.Name = "tabRestore";
-            this.tabRestore.Size = new System.Drawing.Size(792, 489);
+            this.tabRestore.Size = new System.Drawing.Size(792, 486);
             this.tabRestore.TabIndex = 1;
             this.tabRestore.Text = "View and Restore";
             // 
@@ -530,7 +527,7 @@
             this.tabControlAdv1.Name = "tabControlAdv1";
             this.tabControlAdv1.Padding = new System.Drawing.Point(63, 3);
             this.tabControlAdv1.SelectedIndex = 0;
-            this.tabControlAdv1.Size = new System.Drawing.Size(521, 459);
+            this.tabControlAdv1.Size = new System.Drawing.Size(521, 486);
             this.tabControlAdv1.TabIndex = 53;
             // 
             // tabPageAdv1
@@ -538,7 +535,7 @@
             this.tabPageAdv1.Controls.Add(this.lstFiles);
             this.tabPageAdv1.Location = new System.Drawing.Point(4, 22);
             this.tabPageAdv1.Name = "tabPageAdv1";
-            this.tabPageAdv1.Size = new System.Drawing.Size(513, 433);
+            this.tabPageAdv1.Size = new System.Drawing.Size(513, 460);
             this.tabPageAdv1.TabIndex = 1;
             this.tabPageAdv1.Text = "Drive";
             // 
@@ -559,7 +556,7 @@
             this.lstFiles.MultiSelect = false;
             this.lstFiles.Name = "lstFiles";
             this.lstFiles.OwnerDraw = true;
-            this.lstFiles.Size = new System.Drawing.Size(513, 433);
+            this.lstFiles.Size = new System.Drawing.Size(513, 460);
             this.lstFiles.TabIndex = 2;
             this.lstFiles.UseCompatibleStateImageBehavior = false;
             this.lstFiles.UseSelectable = true;
@@ -590,7 +587,7 @@
             this.tabEmail.Location = new System.Drawing.Point(4, 22);
             this.tabEmail.Name = "tabEmail";
             this.tabEmail.Padding = new System.Windows.Forms.Padding(3);
-            this.tabEmail.Size = new System.Drawing.Size(513, 433);
+            this.tabEmail.Size = new System.Drawing.Size(513, 430);
             this.tabEmail.TabIndex = 2;
             this.tabEmail.Text = "Email";
             this.tabEmail.UseVisualStyleBackColor = true;
@@ -616,7 +613,7 @@
             this.lstGmail.Location = new System.Drawing.Point(105, 0);
             this.lstGmail.Name = "lstGmail";
             this.lstGmail.OwnerDraw = true;
-            this.lstGmail.Size = new System.Drawing.Size(405, 146);
+            this.lstGmail.Size = new System.Drawing.Size(405, 143);
             this.lstGmail.TabIndex = 3;
             this.lstGmail.UseCompatibleStateImageBehavior = false;
             this.lstGmail.UseSelectable = true;
@@ -669,7 +666,7 @@
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(0, 0);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(268, 489);
+            this.listBox1.Size = new System.Drawing.Size(268, 486);
             this.listBox1.TabIndex = 39;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
@@ -789,6 +786,10 @@
             this.contextMenuStrip2.Name = "contextMenuStrip2";
             this.contextMenuStrip2.Size = new System.Drawing.Size(61, 4);
             // 
+            // bgwAD
+            // 
+            this.bgwAD.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgwAD_DoWork);
+            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -804,7 +805,7 @@
             this.Name = "Form1";
             this.Padding = new System.Windows.Forms.Padding(1, 60, 1, 1);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "TTO: Google Drive Backup";
+            this.Text = "TTO: Google Drive Backup --- Mike Tucker http://ttobackup.readme.io/";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.statusStrip1.ResumeLayout(false);
@@ -906,6 +907,7 @@
         private System.Windows.Forms.ContextMenuStrip conNotifyTray;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.ComponentModel.BackgroundWorker bgwAD;
     }
 }
 

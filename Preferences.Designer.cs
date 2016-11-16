@@ -65,6 +65,8 @@
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.tipBiggerThan = new System.Windows.Forms.ToolTip(this.components);
+            this.tabSchedule = new MetroFramework.Controls.MetroTabPage();
+            this.btnClose = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.metroTabControl1.SuspendLayout();
@@ -95,7 +97,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -118,6 +120,7 @@
             // 
             this.metroTabControl1.Controls.Add(this.tabSettings);
             this.metroTabControl1.Controls.Add(this.tabAdvanced);
+            this.metroTabControl1.Controls.Add(this.tabSchedule);
             this.metroTabControl1.Location = new System.Drawing.Point(12, 27);
             this.metroTabControl1.Name = "metroTabControl1";
             this.metroTabControl1.SelectedIndex = 1;
@@ -142,6 +145,7 @@
             this.tabSettings.Controls.Add(this.txtEmail);
             this.tabSettings.Controls.Add(this.txtDefaultDomain);
             this.tabSettings.Controls.Add(this.txtSaveLocation);
+            this.tabSettings.Cursor = System.Windows.Forms.Cursors.Default;
             this.tabSettings.HorizontalScrollbarBarColor = true;
             this.tabSettings.HorizontalScrollbarHighlightOnWheel = false;
             this.tabSettings.HorizontalScrollbarSize = 10;
@@ -328,6 +332,7 @@
             // 
             this.metroPanel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.metroPanel2.CausesValidation = false;
+            this.metroPanel2.Controls.Add(this.btnClose);
             this.metroPanel2.Controls.Add(this.txtProcessors);
             this.metroPanel2.Controls.Add(this.lblMultithread);
             this.metroPanel2.Controls.Add(this.btnSaveMB);
@@ -522,6 +527,30 @@
             this.tipBiggerThan.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.tipBiggerThan.ToolTipTitle = "Advanced Info";
             // 
+            // tabSchedule
+            // 
+            this.tabSchedule.HorizontalScrollbarBarColor = true;
+            this.tabSchedule.HorizontalScrollbarHighlightOnWheel = false;
+            this.tabSchedule.HorizontalScrollbarSize = 10;
+            this.tabSchedule.Location = new System.Drawing.Point(4, 38);
+            this.tabSchedule.Name = "tabSchedule";
+            this.tabSchedule.Size = new System.Drawing.Size(519, 376);
+            this.tabSchedule.TabIndex = 2;
+            this.tabSchedule.Text = "Scheduling";
+            this.tabSchedule.VerticalScrollbarBarColor = true;
+            this.tabSchedule.VerticalScrollbarHighlightOnWheel = false;
+            this.tabSchedule.VerticalScrollbarSize = 10;
+            // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(430, 116);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 18;
+            this.btnClose.Text = "&Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
             // Preferences
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -592,5 +621,7 @@
         private System.Windows.Forms.Label lblWhatsThis;
         private MetroFramework.Controls.MetroTextBox txtProcessors;
         private MetroFramework.Controls.MetroLabel lblMultithread;
+        private MetroFramework.Controls.MetroTabPage tabSchedule;
+        private System.Windows.Forms.Button btnClose;
     }
 }

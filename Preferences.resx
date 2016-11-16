@@ -126,6 +126,24 @@
   <metadata name="tipBiggerThan.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>248, 17</value>
   </metadata>
+  <data name="lblMultithread.ToolTip" xml:space="preserve">
+    <value>[BETA] Speed up backup performance significantly.
+This is a thoroughly untested feature and is new as of
+the .85a version release.
+
+The value entered here will determine how many threads
+TTO Backup will execute at a time to help increase download
+performances.
+
+There is a caveat: if you enter a high value (in my scenarios,
+any number above 4 is too high), Google's servers will
+prematurely end your backup session because they throttle
+the amount of requests on your project's API.
+
+If you like to live dangerously, try entering a higher value
+for increased download performance. I suggest a value of 3.
+</value>
+  </data>
   <data name="lblWhatsThis.ToolTip" xml:space="preserve">
     <value>These are Optional fields. Type in your AD domain for the default domain and then your "replace domain" is your Gsuite address. 
 
@@ -133,19 +151,6 @@ This will allow the program to automatically change your userbase from user@Defa
 
 Typically used for instances where you'd want TTO's GSuite backup tool to automatically do the work for you when it comes to mirror'ing
 what you would expect to see from your GSuite admin console. Go ahead, give it a try!
-</value>
-  </data>
-  <data name="lblMultithread.ToolTip" xml:space="preserve">
-    <value>[BETA] Speed up backup performance significantly.
-This is a thoroughly untested feature as of ver .085a.
-
-Enter a numbe percentage of your system resources
-that you wish to allocate this program to use.
-
-I found some stability issues when I went above 4 cores
-on an 8 core PC. Only available on an x64 arch!
-
-But if you like to live dangerously, feel free to go higher.
 </value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
