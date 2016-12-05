@@ -1,12 +1,13 @@
 ﻿// Created by Mike Tucker
 // mtucker6784@gmail.com
 // Provided under GPL 3.0 @ http://www.gnu.org/licenses/gpl.html
-// For LDAP, add System.DirectoryServices.AccountManagement reference
+// Google APIs are provided under APL-2 @ http://www.apache.org/licenses/LICENSE-2.0
 
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
+using Google.Apis.Gmail.v1;
 using System;
 using System.ComponentModel;
 using System.Configuration;
@@ -20,6 +21,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace TuckerTech_GABackup_GUI
 {
@@ -101,6 +103,9 @@ namespace TuckerTech_GABackup_GUI
         private void bgW_DoWork(object sender, DoWorkEventArgs e)
         {
             {
+                Action<Exception> errorHandler = (ex) => {
+                    Console.WriteLine("ERROR: " + ex.Message.ToString());
+                };
                 try
                 {
                     txtFile.ReadOnly = true;
@@ -158,14 +163,40 @@ namespace TuckerTech_GABackup_GUI
 
                                         // Check if directory exists, create if not.
                                         string savelocation = ConfigurationManager.AppSettings["savelocation"] + user + "\\";
+                                        /* 
+                                         * Getting ready for Gmail implementation. Dec 01 2016
+                                         * 
+                                        int totalunread = 0;
+                                        UsersResource.LabelsResource.ListRequest request = CreateService.EmailService(names).Users.Labels.List(names);
+                                        UsersResource.MessagesResource.ListRequest email = CreateService.EmailService(names).Users.Messages.List(names);
+                                        email.Q = "in:unread";
+                                        IList<Google.Apis.Gmail.v1.Data.Label> labels = request.Execute().Labels;
+                                        IList<Google.Apis.Gmail.v1.Data.Message> emails = email.Execute().Messages;
+                                        if (emails != null && emails.Count > 0)
+                                        {
+                                            foreach (Google.Apis.Gmail.v1.Data.Message emailItem in emails)
+                                            {
 
+                                                string forcestring = emailItem.Id.ToString();
+                                                Google.Apis.Gmail.v1.Data.Message fullemail = CreateService.EmailService(names).Users.Messages.Get(names, forcestring).Execute();
+                                                ListViewItem listitem = new ListViewItem(new[] { fullemail.Payload.Headers[3].Value, fullemail.Payload.Headers[16].Value + " " + fullemail.Payload.Headers[15].Value, fullemail.Snippet, fullemail.Id });
+                                                Console.WriteLine("{0}, Date: {1}", fullemail.Snippet, fullemail.Payload.Headers[3].Value);
+                                                totalunread++;
+                                            }
+                                            Console.WriteLine(totalunread);
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Notta");
+                                        }
+                                        */
                                         if (File.Exists(savelocation + ".deltalog.tok"))
                                             File.Delete(savelocation + ".deltalog.tok");
                                         FileInfo testdir = new FileInfo(savelocation);
                                         testdir.Directory.Create();
                                         string savedStartPageToken = "";
                                         var start = CreateService.BuildService(user).Changes.GetStartPageToken().Execute();
-
+                                        //UsersResource.LabelsResource.ListRequest request = CreateService.BuildService(user).
                                         // This token is set by Google, it defines changes made and
                                         // increments the token value automatically. 
                                         // The following reads the current token file (if it exists)
@@ -209,7 +240,7 @@ namespace TuckerTech_GABackup_GUI
                                                 // .deltalog.tok is where we will place our records for changed files
                                                 Console.WriteLine("Changes detected. Making notes while we go through these.");
                                                 lblProgresslbl.Text = "Scanning Drive directory.";
-
+                                                GC.Collect();
                                                 // Damnit Google, why did you change how the change fields work?
                                                 if (savedStartPageToken == "1")
                                                 {
@@ -295,7 +326,7 @@ namespace TuckerTech_GABackup_GUI
                                                             Console.WriteLine("Filename: " + values[1]);
                                                             logFile.WriteLine("ID: " + values[0] + " - Filename: " + values[1]);
                                                             logFile.Flush();
-
+                                                            GC.Collect();
 
                                                             // Things get sloppy here. The reason we're checking MimeTypes
                                                             // is because we have to export the files from Google's format
@@ -443,7 +474,7 @@ namespace TuckerTech_GABackup_GUI
                                                                 string dest1 = Path.Combine(savelocation, fileName + ext);
                                                                 var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                                                                 scrolltobtm();
-                                                                Thread.Sleep(300);
+                                                                System.Threading.Thread.Sleep(300);
                                                                 requestfileid.MediaDownloader.ProgressChanged +=
                                                                          (IDownloadProgress progress) =>
                                                                          {
@@ -492,7 +523,7 @@ namespace TuckerTech_GABackup_GUI
                                                                 //statusStripLabel1.Text = (savelocation + fileName + ext);
                                                                 string dest1 = Path.Combine(savelocation, fileName + ext);
                                                                 var stream1 = new System.IO.FileStream(dest1, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                                                                Thread.Sleep(500);
+                                                                System.Threading.Thread.Sleep(500);
                                                                 requestfileid.MediaDownloader.ProgressChanged +=
                                                                          (IDownloadProgress progress) =>
                                                                          {
@@ -550,15 +581,15 @@ namespace TuckerTech_GABackup_GUI
                                             }
                                         }
                                     }
-                                    catch (Google.GoogleApiException ex)
-                                    {
-                                        Console.WriteLine("Info: " + ex.Message.ToString());
-                                    }
+                                    catch (FormatException ex) { errorHandler(ex); }
+                                    catch (Google.GoogleApiException ex) { errorHandler(ex); }
+                                    catch (AggregateException ex) { errorHandler(ex); }
+                                    catch (OverflowException ex) { errorHandler(ex); }
+                                    catch (ArgumentNullException ex) { errorHandler(ex); }
                                 }
                             );
                             if (checkforfinished.IsCompleted == true)
                             {
-                                
                                 MessageBox.Show("Backup for all users is complete!");
                                 Console.WriteLine("Backup for all users is complete!");
                             }
@@ -571,10 +602,13 @@ namespace TuckerTech_GABackup_GUI
                         }
                     }
                 }
-                catch (Google.GoogleApiException ex)
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Info: " + ex.Message.ToString());
-                    //txtLog.Text += (Environment.NewLine);
+                    if (ex is Google.GoogleApiException || ex is AggregateException || ex is ArgumentNullException)
+                    {
+                        Console.WriteLine("Info: " + ex.Message.ToString());
+                    }
+                    throw;
                 }
 
             }
@@ -858,6 +892,9 @@ namespace TuckerTech_GABackup_GUI
 
         private void conRestore_Click(object sender, EventArgs e)
         {
+            Action<Exception> errorHandler = (ex) => {
+                Console.WriteLine("ERROR: " + ex.Message.ToString());
+            };
             try
             {
                 // Messy. Come back later to fix this.
@@ -870,6 +907,10 @@ namespace TuckerTech_GABackup_GUI
                 string selectedfile = lstFiles.SelectedItems[0].SubItems[2].Text;
                 string findext = selectedfile.Substring(selectedfile.Length - 4);
                 string googletype = null;
+                ListViewItem fullfilename = lstFiles.SelectedItems[0];
+                string temp = fullfilename.SubItems[2].Text;
+
+
 
 
                 txtLog.Text += ("Restoring File \"" + lstFiles.SelectedItems[0].Text + "\" to " + unonly + " root drive" + Environment.NewLine);
@@ -923,27 +964,117 @@ namespace TuckerTech_GABackup_GUI
                         googletype = "image/png";
                         break;
                     default:
-                        fileMetadata.MimeType = "?";
+                        fileMetadata.MimeType = "application/vnd.google-apps.folder";
                         break;
                 }
-                FilesResource.CreateMediaUpload request;
-                using (var stream = new System.IO.FileStream(selectedfile,
-                                        System.IO.FileMode.Open))
+                if (fileMetadata.MimeType == "application/vnd.google-apps.folder")
                 {
-                    request = CreateService.BuildService(unonly).Files.Create(
-                        fileMetadata, stream, googletype);
-                    request.Fields = "id";
-                    request.Upload();
+                    fileMetadata.Name = lstFiles.SelectedItems[0].Text + "_RES_" + rndfileadd;
+                    var requestfolder = CreateService.BuildService(unonly).Files.Create(fileMetadata);
+                    requestfolder.Fields = "id";
+                    var folder = requestfolder.Execute();
+                    Console.WriteLine("Folder ID: " + folder.Id);
+                    fileMetadata.Parents = new List<string> { folder.Id };
+                    string[] allfiles = Directory.GetFiles(temp);
+                    FilesResource.CreateMediaUpload requestfile;
+                    foreach (string filename in allfiles)
+                    {
+                        txtLog.Text += "[" + unonly + "] Restoring file: " + filename;
+                        findext = filename.Substring(filename.Length - 4);
+                        switch (findext)
+                        {
+                            case "application/pdf":
+                                fileMetadata.MimeType = "application/vnd.google-apps.spreadsheet";
+                                googletype = "application/pdf";
+                                break;
+                            case "xlsx":
+                                 fileMetadata.MimeType = "application/vnd.google-apps.spreadsheet";
+                                googletype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                                break;
+                            case ".xlsx":
+                                fileMetadata.MimeType = "application/vnd.google-apps.spreadsheet";
+                                googletype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                                break;
+                            case ".txt":
+                                fileMetadata.MimeType = "text/plain";
+                                googletype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                                break;
+                            case ".doc":
+                                fileMetadata.MimeType = "application/vnd.google-apps.document";
+                                googletype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                                break;
+                            case "docx":
+                                fileMetadata.MimeType = "application/vnd.google-apps.document";
+                                googletype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                                break;
+                            case "pptx":
+                                fileMetadata.MimeType = "application/vnd.google-apps.presentation";
+                                googletype = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+                                break;
+                            case "ppt":
+                                fileMetadata.MimeType = "application/vnd.google-apps.presentation";
+                                googletype = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+                                break;
+                            case ".pdf":
+                                fileMetadata.MimeType = "application/pdf";
+                                googletype = "application/pdf";
+                                break;
+                            case ".jpg":
+                                fileMetadata.MimeType = "application/vnd.google.drive.ext-type.jpg";
+                                googletype = "image/jpg";
+                                break;
+                            case "jpeg":
+                                fileMetadata.MimeType = "application/vnd.google.drive.ext-type.jpg";
+                                googletype = "image/jpg";
+                                break;
+                            case ".png":
+                                fileMetadata.MimeType = "application/vnd.google.drive.ext-type.png";
+                                googletype = "image/png";
+                                break;
+                            default:
+                                //fileMetadata.MimeType = "text/plain";
+                                //googletype = "text/plain";
+                                fileMetadata.MimeType = "application/vnd.google-apps.folder";
+                                break;
+                        }
+                        fileMetadata.Name = Path.GetFileName(filename);
+                        fileMetadata.Description = "Restored by TTO Backup on " + DateTime.Now;
+                        Console.WriteLine("FILENAME: " + filename +"\n");
+                        using (var stream = new System.IO.FileStream(filename,
+    System.IO.FileMode.Open))
+                        {
+                            requestfile = CreateService.BuildService(unonly).Files.Create(
+    fileMetadata, stream, googletype);
+                            requestfile.Fields = "id";
+                            requestfile.Upload();
+                        }
+                        var file = requestfile.ResponseBody;
+                        //Console.WriteLine("File id: " + file.Id);
+                    }
                 }
-                var file = request.ResponseBody;
-                txtLog.Text += (lstFiles.SelectedItems[0].Text + " was successfully restored to " + unonly + "'s drive" + Environment.NewLine);
-                statusStripLabel1.Text = "File was successfully restored!";
+                else
+                {
+                    FilesResource.CreateMediaUpload request;
+                    using (var stream = new System.IO.FileStream(selectedfile,
+                                            System.IO.FileMode.Open))
+                    {
+                        request = CreateService.BuildService(unonly).Files.Create(
+                            fileMetadata, stream, googletype);
+                        request.Fields = "id";
+                        request.Upload();
+                    }
+                    var file = request.ResponseBody;
+                    txtLog.Text += (lstFiles.SelectedItems[0].Text + " was successfully restored to " + unonly + "'s drive" + Environment.NewLine);
+                    statusStripLabel1.Text = "File was successfully restored!";
+                    Console.WriteLine("Folder ID is: " + file.Id);
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Sorry, I don't support this action yet. I can only restore files.\n\n[Debug] Literal error is:\n" + ex.Message.ToString(), "Unsupported action", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                txtLog.Text += Environment.NewLine + "Failed to restore file!" + Environment.NewLine;
-            }
+            catch (FormatException ex) { errorHandler(ex); }
+            catch (Google.GoogleApiException ex) { errorHandler(ex); }
+            catch (AggregateException ex) { errorHandler(ex); }
+            catch (OverflowException ex) { errorHandler(ex); }
+            catch (ArgumentNullException ex) { errorHandler(ex); }
+            catch (Exception ex) { errorHandler(ex); }
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -1218,9 +1349,32 @@ namespace TuckerTech_GABackup_GUI
                 Console.WriteLine(ex.Message.ToString());
                 return null;
             }
-
         }
+        public static GmailService EmailService(string userEmail)
+        {
+            try
+            {
+                X509Certificate2 certificate = new X509Certificate2(SERVICE_ACCOUNT_PKCS12_FILE_PATH,
+                    "notasecret", X509KeyStorageFlags.Exportable);
+                ServiceAccountCredential credential = new ServiceAccountCredential(
+                    new ServiceAccountCredential.Initializer(SERVICE_ACCOUNT_EMAIL)
+                    {
+                        Scopes = new[] { GmailService.Scope.MailGoogleCom },
+                        User = userEmail
+                    }.FromCertificate(certificate));
 
+                var service = new GmailService(new Google.Apis.Services.BaseClientService.Initializer()
+                {
+                    ApplicationName = "MyApp",
+                    HttpClientInitializer = credential
+                });
+                return service;
+            }
+            catch (Google.GoogleApiException ex)
+            {
+                Console.WriteLine(ex.Message.ToString());
+                return null;
+            }
+        }
     }
-
 }
