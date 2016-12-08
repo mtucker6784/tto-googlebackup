@@ -1,4 +1,6 @@
 ﻿using Google.Apis.Drive.v3;
+using Google.Apis.Gmail.v1;
+using Google.Apis.Gmail.v1.Data;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,6 +15,16 @@ namespace TuckerTech_GABackup_GUI
     public class exfunctions : Form1
     {
         Form1 sendtolog = new Form1();
+
+        /// <summary>
+        /// Dec 2016
+        /// We will stack all our Gmail components up here.
+        /// </summary>
+
+        public static void getUnread(string savelocation)
+        {
+            
+        }
         public static void CreateSubDir(string savelocation)
         {
             Console.WriteLine("CREATING SUBDIR: " + savelocation);
@@ -45,7 +57,6 @@ namespace TuckerTech_GABackup_GUI
                     {
                         string match1 = string.Join(",", x.a[0]);
                         string match2 = string.Join(",", x.b[2]);
-
                     if (match1 == match2)
                     {
                         Directory.Move(savelocation + x.b[3], x.a[1] + x.b[3]);
@@ -60,7 +71,8 @@ namespace TuckerTech_GABackup_GUI
                     }
                     catch (IOException ex)
                     {
-                        Console.Write("Error: " + ex.Message.ToString());
+                        Console.Write("Error with directory: " + ex.Message.ToString() + "Directory in question: " + savelocation+x.b[3] + "\nIt's probably safe to say this exists in a parent directory. Let's clean this out.");
+                        Directory.Delete(savelocation + x.b[3]);
                     }
                 }
                 catch (Exception ex)
@@ -355,6 +367,7 @@ namespace TuckerTech_GABackup_GUI
                 while (pageToken != null)
                 {
                     var request = CreateService.BuildService(user).Changes.List(pageToken);
+                    
                     request.Fields = "changes,kind,newStartPageToken,nextPageToken";
                     request.RestrictToMyDrive = false;
                     request.PageSize = 1000;
