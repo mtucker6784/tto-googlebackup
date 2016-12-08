@@ -103,7 +103,8 @@ namespace TuckerTech_GABackup_GUI
         private void bgW_DoWork(object sender, DoWorkEventArgs e)
         {
             {
-                Action<Exception> errorHandler = (ex) => {
+                Action<Exception> errorHandler = (ex) =>
+                {
                     Console.WriteLine("ERROR: " + ex.Message.ToString());
                 };
                 try
@@ -564,17 +565,19 @@ namespace TuckerTech_GABackup_GUI
                                                                 stream1.Close();
                                                                 stream1.Dispose();
                                                             }
+
                                                         }
                                                         catch (Exception ex)
                                                         {
                                                             Console.Write("\nInfo: ---> " + ex.Message.ToString() + "\n");
                                                         }
                                                     }
+                                                    txtLog.Text += (Environment.NewLine + "[" + user + "] Moving files to their folders, please wait.");
+                                                    exfunctions.MoveFiles(savelocation);
+                                                    Console.WriteLine("\n\n\tBackup completed for selected user!");
+                                                    txtLog.Text += (Environment.NewLine + "\n\nBackup completed for selected " + user + "\n\n" + Environment.NewLine);
+                                                    btnStart.Text = "Start Backup!";
                                                 }
-                                                exfunctions.MoveFiles(savelocation);
-                                                Console.WriteLine("\n\n\tBackup completed for selected user!");
-                                                txtLog.Text += (Environment.NewLine + "\n\nBackup completed for selected " + user + "\n\n" + Environment.NewLine);
-                                                btnStart.Text = "Start Backup!";
                                                 logfile.Flush();
                                                 logFile.Close();
                                                 logFile.Dispose();
@@ -892,7 +895,8 @@ namespace TuckerTech_GABackup_GUI
 
         private void conRestore_Click(object sender, EventArgs e)
         {
-            Action<Exception> errorHandler = (ex) => {
+            Action<Exception> errorHandler = (ex) =>
+            {
                 Console.WriteLine("ERROR: " + ex.Message.ToString());
             };
             try
@@ -988,7 +992,7 @@ namespace TuckerTech_GABackup_GUI
                                 googletype = "application/pdf";
                                 break;
                             case "xlsx":
-                                 fileMetadata.MimeType = "application/vnd.google-apps.spreadsheet";
+                                fileMetadata.MimeType = "application/vnd.google-apps.spreadsheet";
                                 googletype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
                                 break;
                             case ".xlsx":
@@ -1039,7 +1043,7 @@ namespace TuckerTech_GABackup_GUI
                         }
                         fileMetadata.Name = Path.GetFileName(filename);
                         fileMetadata.Description = "Restored by TTO Backup on " + DateTime.Now;
-                        Console.WriteLine("FILENAME: " + filename +"\n");
+                        Console.WriteLine("FILENAME: " + filename + "\n");
                         using (var stream = new System.IO.FileStream(filename,
     System.IO.FileMode.Open))
                         {
