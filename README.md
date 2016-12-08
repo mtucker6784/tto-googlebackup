@@ -23,7 +23,7 @@ At this time, I'm mainly concerned about backing up drive documents, so that's t
 Known issue(s) / concerns / future plans:
 
 1. Create master log file for overall status. A log file is currently written for each user and streamed to their root drive directory.
-2. Add restore feature
+2. Add backup/restore for user Gmail boxes.
 
 Hope this helps others who are looking for a similar solution!
 
