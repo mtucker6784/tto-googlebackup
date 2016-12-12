@@ -341,7 +341,7 @@
             this.metroTabControl1.Location = new System.Drawing.Point(7, 5);
             this.metroTabControl1.Multiline = true;
             this.metroTabControl1.Name = "metroTabControl1";
-            this.metroTabControl1.SelectedIndex = 1;
+            this.metroTabControl1.SelectedIndex = 0;
             this.metroTabControl1.Size = new System.Drawing.Size(800, 531);
             this.metroTabControl1.TabIndex = 41;
             this.metroTabControl1.UseSelectable = true;
@@ -351,9 +351,9 @@
             this.tabBackup.Controls.Add(this.txtLog);
             this.tabBackup.Controls.Add(this.panel1);
             this.tabBackup.Controls.Add(this.lstBackupUsers);
-            this.tabBackup.Location = new System.Drawing.Point(4, 38);
+            this.tabBackup.Location = new System.Drawing.Point(4, 41);
             this.tabBackup.Name = "tabBackup";
-            this.tabBackup.Size = new System.Drawing.Size(792, 489);
+            this.tabBackup.Size = new System.Drawing.Size(792, 486);
             this.tabBackup.TabIndex = 0;
             this.tabBackup.Text = "Backup Files";
             // 
@@ -370,7 +370,7 @@
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(615, 290);
+            this.txtLog.Size = new System.Drawing.Size(615, 287);
             this.txtLog.TabIndex = 57;
             // 
             // panel1
@@ -494,7 +494,7 @@
             this.lstBackupUsers.Location = new System.Drawing.Point(0, 0);
             this.lstBackupUsers.Name = "lstBackupUsers";
             this.lstBackupUsers.OwnerDraw = true;
-            this.lstBackupUsers.Size = new System.Drawing.Size(177, 489);
+            this.lstBackupUsers.Size = new System.Drawing.Size(177, 486);
             this.lstBackupUsers.TabIndex = 55;
             this.lstBackupUsers.UseCompatibleStateImageBehavior = false;
             this.lstBackupUsers.UseSelectable = true;
@@ -527,7 +527,7 @@
             this.tabControlAdv1.Name = "tabControlAdv1";
             this.tabControlAdv1.Padding = new System.Drawing.Point(63, 3);
             this.tabControlAdv1.SelectedIndex = 0;
-            this.tabControlAdv1.Size = new System.Drawing.Size(521, 477);
+            this.tabControlAdv1.Size = new System.Drawing.Size(521, 474);
             this.tabControlAdv1.TabIndex = 53;
             // 
             // tabPageAdv1
@@ -535,7 +535,7 @@
             this.tabPageAdv1.Controls.Add(this.lstFiles);
             this.tabPageAdv1.Location = new System.Drawing.Point(4, 22);
             this.tabPageAdv1.Name = "tabPageAdv1";
-            this.tabPageAdv1.Size = new System.Drawing.Size(513, 451);
+            this.tabPageAdv1.Size = new System.Drawing.Size(513, 448);
             this.tabPageAdv1.TabIndex = 1;
             this.tabPageAdv1.Text = "Drive";
             // 
@@ -556,7 +556,7 @@
             this.lstFiles.MultiSelect = false;
             this.lstFiles.Name = "lstFiles";
             this.lstFiles.OwnerDraw = true;
-            this.lstFiles.Size = new System.Drawing.Size(513, 451);
+            this.lstFiles.Size = new System.Drawing.Size(513, 448);
             this.lstFiles.TabIndex = 2;
             this.lstFiles.UseCompatibleStateImageBehavior = false;
             this.lstFiles.UseSelectable = true;
@@ -587,7 +587,7 @@
             this.tabEmail.Location = new System.Drawing.Point(4, 22);
             this.tabEmail.Name = "tabEmail";
             this.tabEmail.Padding = new System.Windows.Forms.Padding(3);
-            this.tabEmail.Size = new System.Drawing.Size(513, 454);
+            this.tabEmail.Size = new System.Drawing.Size(513, 451);
             this.tabEmail.TabIndex = 2;
             this.tabEmail.Text = "Email";
             this.tabEmail.UseVisualStyleBackColor = true;
