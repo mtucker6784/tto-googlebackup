@@ -467,8 +467,8 @@ namespace TuckerTech_GABackup_GUI
                     // Bring our token up to date for next run
                     pageToken = changes.NextPageToken;
                     savedStartPageToken = changes.NextPageToken;
-                    File.WriteAllText(savelocation + ".currenttoken.tok", start.StartPageTokenValue + "," + pageToken);
-
+                    //File.WriteAllText(savelocation + ".currenttoken.tok", start.StartPageTokenValue + "," + pageToken);
+                    File.WriteAllText(savelocation + ".currenttoken.tok", start.StartPageTokenValue);
                 }
                 deltalog.Close();
                 logFile.Close();
