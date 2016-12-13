@@ -370,7 +370,7 @@
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(615, 287);
+            this.txtLog.Size = new System.Drawing.Size(615, 302);
             this.txtLog.TabIndex = 57;
             // 
             // panel1
@@ -510,9 +510,9 @@
             this.tabRestore.Controls.Add(this.tabControlAdv1);
             this.tabRestore.Controls.Add(this.lblUserTitle);
             this.tabRestore.Controls.Add(this.listBox1);
-            this.tabRestore.Location = new System.Drawing.Point(4, 41);
+            this.tabRestore.Location = new System.Drawing.Point(4, 38);
             this.tabRestore.Name = "tabRestore";
-            this.tabRestore.Size = new System.Drawing.Size(792, 486);
+            this.tabRestore.Size = new System.Drawing.Size(792, 489);
             this.tabRestore.TabIndex = 1;
             this.tabRestore.Text = "View and Restore";
             // 
@@ -666,7 +666,7 @@
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(0, 0);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(268, 486);
+            this.listBox1.Size = new System.Drawing.Size(268, 489);
             this.listBox1.TabIndex = 39;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 

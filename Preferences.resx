@@ -126,6 +126,26 @@
   <metadata name="tipBiggerThan.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>248, 17</value>
   </metadata>
+  <data name="lblWhatsThis.ToolTip" xml:space="preserve">
+    <value>These are Optional fields. Type in your AD domain for the default domain and then your "replace domain" is your Gsuite address. 
+
+This will allow the program to automatically change your userbase from user@Default.xyz to user@Gsuite.xyz for LDAP convenience.
+
+Typically used for instances where you'd want TTO's GSuite backup tool to automatically do the work for you when it comes to mirror'ing
+what you would expect to see from your GSuite admin console. Go ahead, give it a try!
+</value>
+  </data>
+  <data name="checkBox1.ToolTip" xml:space="preserve">
+    <value>Want me to overwrite an existing file? 
+
+Check = Overwrite
+Don't make a backup of a file, just overwrite the current one
+- This is preferred if you have a backup server that already
+makes file revisions (and backs up your G Suite Backup directory)-
+
+Uncheck = Don't overwrite. 
+Rename existing file then download the new one.</value>
+  </data>
   <data name="lblMultithread.ToolTip" xml:space="preserve">
     <value>[BETA] Speed up backup performance significantly.
 This is a thoroughly untested feature and is new as of
@@ -142,15 +162,6 @@ the amount of requests on your project's API.
 
 If you like to live dangerously, try entering a higher value
 for increased download performance. I suggest a value of 3.
-</value>
-  </data>
-  <data name="lblWhatsThis.ToolTip" xml:space="preserve">
-    <value>These are Optional fields. Type in your AD domain for the default domain and then your "replace domain" is your Gsuite address. 
-
-This will allow the program to automatically change your userbase from user@Default.xyz to user@Gsuite.xyz for LDAP convenience.
-
-Typically used for instances where you'd want TTO's GSuite backup tool to automatically do the work for you when it comes to mirror'ing
-what you would expect to see from your GSuite admin console. Go ahead, give it a try!
 </value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />

@@ -103,8 +103,7 @@ namespace TuckerTech_GABackup_GUI
         private void bgW_DoWork(object sender, DoWorkEventArgs e)
         {
             {
-                Action<Exception> errorHandler = (ex) =>
-                {
+                Action<Exception> errorHandler = (ex) => {
                     Console.WriteLine("ERROR: " + ex.Message.ToString());
                 };
                 try
@@ -144,185 +143,170 @@ namespace TuckerTech_GABackup_GUI
                             StreamWriter logfile = new StreamWriter(Environment.CurrentDirectory + "\\Logs\\MasterLogFile_" + curdate + ".log", true);
 
                             var checkforfinished = Parallel.ForEach(lstBackupUsers.Items.Cast<ListViewItem>(), opts, name =>
+                            {
+                                try
                                 {
-                                Console.WriteLine("Selecting row: " + arraycount.ToString());
-                                string names = name.SubItems[0].Text;
-                                if (arraycount == usercount)
-                                    return;
-                                lstBackupUsers.Items[name.Index].Selected = true;
-                                lstBackupUsers.Items[name.Index].BackColor = Color.CornflowerBlue;
-                                curIndex = Interlocked.Increment(ref arraycount);
-                                stripLabel.Text = "";
-                                Console.WriteLine("Selecting user: " + names.ToString());
-                                txtLog.Text += "Selecting user: " + names.ToString() + Environment.NewLine;
-                                logfile.WriteLine("Selecting user: " + names.ToString() + Environment.NewLine);
-                                txtCurrentUser.Text = names.ToString();
-                                // Define parameters of request.
-                                string user = names.ToString();
-
-                                // Check if directory exists, create if not.
-                                string savelocation = ConfigurationManager.AppSettings["savelocation"] + user + "\\";
-                                /* 
-                                 * Getting ready for Gmail implementation. Dec 01 2016
-                                 * 
-                                int totalunread = 0;
-                                UsersResource.LabelsResource.ListRequest request = CreateService.EmailService(names).Users.Labels.List(names);
-                                UsersResource.MessagesResource.ListRequest email = CreateService.EmailService(names).Users.Messages.List(names);
-                                email.Q = "in:unread";
-                                IList<Google.Apis.Gmail.v1.Data.Label> labels = request.Execute().Labels;
-                                IList<Google.Apis.Gmail.v1.Data.Message> emails = email.Execute().Messages;
-                                if (emails != null && emails.Count > 0)
-                                {
-                                    foreach (Google.Apis.Gmail.v1.Data.Message emailItem in emails)
-                                    {
-
-                                        string forcestring = emailItem.Id.ToString();
-                                        Google.Apis.Gmail.v1.Data.Message fullemail = CreateService.EmailService(names).Users.Messages.Get(names, forcestring).Execute();
-                                        ListViewItem listitem = new ListViewItem(new[] { fullemail.Payload.Headers[3].Value, fullemail.Payload.Headers[16].Value + " " + fullemail.Payload.Headers[15].Value, fullemail.Snippet, fullemail.Id });
-                                        Console.WriteLine("{0}, Date: {1}", fullemail.Snippet, fullemail.Payload.Headers[3].Value);
-                                        totalunread++;
-                                    }
-                                    Console.WriteLine(totalunread);
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Notta");
-                                }
-                                */
-                                if (File.Exists(savelocation + ".deltalog.tok"))
-                                    File.Delete(savelocation + ".deltalog.tok");
-                                FileInfo testdir = new FileInfo(savelocation);
-                                testdir.Directory.Create();
-                                string savedStartPageToken = "";
-                                var start = CreateService.BuildService(user).Changes.GetStartPageToken().Execute();
-                                //UsersResource.LabelsResource.ListRequest request = CreateService.BuildService(user).
-                                // This token is set by Google, it defines changes made and
-                                // increments the token value automatically. 
-                                // The following reads the current token file (if it exists)
-                                if (File.Exists(savelocation + ".currenttoken.tok"))
-                                {
-                                    StreamReader curtokenfile = new StreamReader(savelocation + ".currenttoken.tok");
-                                    savedStartPageToken = curtokenfile.ReadLine().ToString();
-                                    curtokenfile.Dispose();
-                                }
-                                else
-                                {
-                                    // Token record didn't exist. Create a generic file, start at "1st" token
-                                    // In reality, I have no idea what token to start at, but 1 seems to be safe.
-                                    Console.Write("Creating new token file.\n");
-                                    //txtLog.Text += ("Creating new token file.\n" + Environment.NewLine);
-                                    StreamWriter sw = new StreamWriter(savelocation + ".currenttoken.tok");
-                                    sw.Write(1);
-                                    sw.Dispose();
-                                    savedStartPageToken = "1";
-                                }
-                                string pageToken = savedStartPageToken;
-                                int gtoken = int.Parse(start.StartPageTokenValue);
-                                int mytoken = int.Parse(savedStartPageToken);
-                                txtPrevToken.Text = pageToken;
-                                txtCurrentToken.Text = gtoken.ToString();
-                                if (gtoken <= 10)
-                                {
-                                    Console.WriteLine("Nothing to save!\n" + Environment.NewLine);
-                                    txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
-                                }
-                                else
-                                {
-                                    if (int.Parse(pageToken) >= int.Parse(start.StartPageTokenValue))
-                                    {
-                                        Console.WriteLine("No file changes found for " + user + "\n" + Environment.NewLine);
-                                        txtLog.Text += ("[" + user + "] No file changes found! Next!" + Environment.NewLine);
+                                    Console.WriteLine("Selecting row: " + arraycount.ToString());
+                                    string names = name.SubItems[0].Text;
+                                    if (arraycount == usercount)
                                         return;
+                                    lstBackupUsers.Items[name.Index].Selected = true;
+                                    lstBackupUsers.Items[name.Index].BackColor = Color.CornflowerBlue;
+                                    curIndex = Interlocked.Increment(ref arraycount);
+                                    stripLabel.Text = "";
+                                    Console.WriteLine("Selecting user: " + names.ToString());
+                                    txtLog.Text += "Selecting user: " + names.ToString() + Environment.NewLine;
+                                    logfile.WriteLine("Selecting user: " + names.ToString() + Environment.NewLine);
+                                    txtCurrentUser.Text = names.ToString();
+                                    // Define parameters of request.
+                                    string user = names.ToString();
+
+                                    // Check if directory exists, create if not.
+                                    string savelocation = ConfigurationManager.AppSettings["savelocation"] + user + "\\";
+                                    /* 
+                                     * Getting ready for Gmail implementation. Dec 01 2016
+                                     * 
+                                    int totalunread = 0;
+                                    UsersResource.LabelsResource.ListRequest request = CreateService.EmailService(names).Users.Labels.List(names);
+                                    UsersResource.MessagesResource.ListRequest email = CreateService.EmailService(names).Users.Messages.List(names);
+                                    email.Q = "in:unread";
+                                    IList<Google.Apis.Gmail.v1.Data.Label> labels = request.Execute().Labels;
+                                    IList<Google.Apis.Gmail.v1.Data.Message> emails = email.Execute().Messages;
+                                    if (emails != null && emails.Count > 0)
+                                    {
+                                        foreach (Google.Apis.Gmail.v1.Data.Message emailItem in emails)
+                                        {
+
+                                            string forcestring = emailItem.Id.ToString();
+                                            Google.Apis.Gmail.v1.Data.Message fullemail = CreateService.EmailService(names).Users.Messages.Get(names, forcestring).Execute();
+                                            ListViewItem listitem = new ListViewItem(new[] { fullemail.Payload.Headers[3].Value, fullemail.Payload.Headers[16].Value + " " + fullemail.Payload.Headers[15].Value, fullemail.Snippet, fullemail.Id });
+                                            Console.WriteLine("{0}, Date: {1}", fullemail.Snippet, fullemail.Payload.Headers[3].Value);
+                                            totalunread++;
+                                        }
+                                        Console.WriteLine(totalunread);
                                     }
                                     else
                                     {
-                                        // .deltalog.tok is where we will place our records for changed files
-                                        Console.WriteLine("Changes detected. Making notes while we go through these.");
-                                        lblProgresslbl.Text = "Scanning Drive directory.";
-                                        GC.Collect();
-                                        // Damnit Google, why did you change how the change fields work?
-                                        if (savedStartPageToken == "1")
+                                        Console.WriteLine("Notta");
+                                    }
+                                    */
+                                    if (File.Exists(savelocation + ".deltalog.tok"))
+                                        File.Delete(savelocation + ".deltalog.tok");
+                                    FileInfo testdir = new FileInfo(savelocation);
+                                    testdir.Directory.Create();
+                                    string savedStartPageToken = "";
+                                    var start = CreateService.BuildService(user).Changes.GetStartPageToken().Execute();
+                                    //UsersResource.LabelsResource.ListRequest request = CreateService.BuildService(user).
+                                    // This token is set by Google, it defines changes made and
+                                    // increments the token value automatically. 
+                                    // The following reads the current token file (if it exists)
+                                    if (File.Exists(savelocation + ".currenttoken.tok"))
+                                    {
+                                        StreamReader curtokenfile = new StreamReader(savelocation + ".currenttoken.tok");
+                                        savedStartPageToken = curtokenfile.ReadLine().ToString();
+                                        curtokenfile.Dispose();
+                                    }
+                                    else
+                                    {
+                                        // Token record didn't exist. Create a generic file, start at "1st" token
+                                        // In reality, I have no idea what token to start at, but 1 seems to be safe.
+                                        Console.Write("Creating new token file.\n");
+                                        //txtLog.Text += ("Creating new token file.\n" + Environment.NewLine);
+                                        StreamWriter sw = new StreamWriter(savelocation + ".currenttoken.tok");
+                                        sw.Write(1);
+                                        sw.Dispose();
+                                        savedStartPageToken = "1";
+                                    }
+                                    string pageToken = savedStartPageToken;
+                                    int gtoken = int.Parse(start.StartPageTokenValue);
+                                    int mytoken = int.Parse(savedStartPageToken);
+                                    txtPrevToken.Text = pageToken;
+                                    txtCurrentToken.Text = gtoken.ToString();
+                                    if (gtoken <= 10)
+                                    {
+                                        Console.WriteLine("Nothing to save!\n" + Environment.NewLine);
+                                        txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
+                                    }
+                                    else
+                                    {
+                                        if (int.Parse(pageToken) >= int.Parse(start.StartPageTokenValue))
                                         {
-                                            //statusStripLabel1.Text = "Recording folder list ...";
-                                            txtLog.Text = "[" + user + "] Recording folder list ..." + Environment.NewLine;
-                                            logfile.WriteLine(user + " --- Recording folder list..." + Environment.NewLine);
-                                            exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
-                                            //statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
-                                            txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
-                                            exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
-                                        }
-                                        else
-                                        {
-                                            //proUserclass = proUser;
-                                            //statusStripLabel1.Text = "Recording new/changed files ... This may take a bit!";
-                                            txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
-                                            exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
-                                            exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
-                                        }
-
-                                        // Get all our files for the user. Max page size is 1k
-                                        // after that, we have to use Google's next page token
-                                        // to let us get more files.
-                                        StreamWriter logFile = new StreamWriter(savelocation + ".recent.log");
-                                        string[] deltafiles = File.ReadAllLines(savelocation + ".deltalog.tok");
-
-                                        double totalfiles = deltafiles.Count();
-                                        int cnttototal = 0;
-                                        Console.WriteLine("\nFiles to backup:\n");
-                                        if (deltafiles == null)
-                                        {
+                                            Console.WriteLine("No file changes found for " + user + "\n" + Environment.NewLine);
+                                            txtLog.Text += ("[" + user + "] No file changes found! Next!" + Environment.NewLine);
                                             return;
                                         }
                                         else
                                         {
-                                            double damn = ((gtoken - int.Parse(txtPrevToken.Text)));
-                                            damn = Math.Round((damn / totalfiles));
-                                            if (damn <= 0)
-                                                damn = 1;
-                                            foreach (var file in deltafiles)
+                                            // .deltalog.tok is where we will place our records for changed files
+                                            Console.WriteLine("Changes detected. Making notes while we go through these.");
+                                            lblProgresslbl.Text = "Scanning Drive directory.";
+                                            GC.Collect();
+                                            // Damnit Google, why did you change how the change fields work?
+                                            if (savedStartPageToken == "1")
                                             {
-                                                try
+                                                txtLog.Text += Environment.NewLine + "[" + user + "] Recording folder list ..." + Environment.NewLine;
+                                                logfile.WriteLine(user + " --- Recording folder list..." + Environment.NewLine);
+                                                exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
+                                                txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
+                                                exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
+                                            }
+                                            else
+                                            {
+                                                txtLog.Text += Environment.NewLine + "[" + user + "] Recording folder list ..." + Environment.NewLine;
+                                                exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
+                                                txtLog.Text += Environment.NewLine + "[" + user + "] Recording new/changed files ..." + Environment.NewLine;
+                                                exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
+                                            }
+
+                                            // Get all our files for the user. Max page size is 1k
+                                            // after that, we have to use Google's next page token
+                                            // to let us get more files.
+                                            StreamWriter logFile = new StreamWriter(savelocation + ".recent.log");
+                                            string[] deltafiles = File.ReadAllLines(savelocation + ".deltalog.tok");
+
+                                            int totalfiles = deltafiles.Count();
+                                            int cnttototal = 0;
+                                            Console.WriteLine("\nFiles to backup:\n");
+                                            if (deltafiles == null)
+                                            {
+                                                return;
+                                            }
+                                            else
+                                            {
+                                                double damn = ((gtoken - double.Parse(txtPrevToken.Text)));
+                                                damn = Math.Round((damn / totalfiles));
+                                                if (damn <= 0)
+                                                    damn = 1;
+                                                //foreach (var file in deltafiles)
+                                                Parallel.ForEach(deltafiles, opts, (file) =>
                                                 {
-                                                    if (bgW.CancellationPending)
+                                                    try
                                                     {
-                                                        stripLabel.Text = "Backup canceled!";
-                                                        e.Cancel = true;
-                                                        break;
-                                                    }
-                                                    DateTime dt = DateTime.Now;
-                                                    string[] foldervalues = File.ReadAllLines(savelocation + "folderlog.txt");
-                                                    string[] newtoken = File.ReadAllLines(savelocation + ".currenttoken.tok");
-                                                    double writetoken = (int.Parse(newtoken[0].ToString()) + damn);
-                                                    txtCurrentUser.Text = user;
-                                                    cnttototal++;
-                                                    bgW.ReportProgress(cnttototal);
-                                                    proUser.Maximum = int.Parse(txtCurrentToken.Text);
-                                                    stripLabel.Text = "File " + cnttototal + " of " + totalfiles;
-                                                    double? mathisfun = 1;
-                                                    mathisfun = ((100 * cnttototal) / totalfiles);
-                                                    txtCurrentUser.Text = user;
-                                                    double mathToken = double.Parse(txtPrevToken.Text);
-                                                    mathToken = Math.Round((damn + mathToken));
-                                                    // Bring our token up to date for next run
-                                                    txtPrevToken.Text = mathToken.ToString();
-                                                    File.WriteAllText(savelocation + ".currenttoken.tok", mathToken.ToString());
-                                                    txtCurrentToken.Text = start.StartPageTokenValue.ToString();
-                                                    // If our current downloaded token is equal to the token we saw originally
-                                                    // Move their files and announce we're finished with this user.
-                                                    if (int.Parse(txtPrevToken.Text) >= int.Parse(start.StartPageTokenValue))
-                                                    {
-                                                        txtLog.Text += (Environment.NewLine + "[" + user + "] Moving files to their folders, please wait.");
-                                                        exfunctions.MoveFiles(savelocation);
-                                                        Console.WriteLine("\n\n\tBackup completed for selected user!");
-                                                        txtLog.Text += (Environment.NewLine + "\n\nBackup completed for selected " + user + "\n\n" + Environment.NewLine);
-                                                        return;
-                                                    }
+                                                        txtCurrentUser.Text = user;
+                                                        DateTime dt = DateTime.Now;
+                                                        string[] foldervalues = File.ReadAllLines(savelocation + "folderlog.txt");
+                                                        cnttototal++;
+                                                        bgW.ReportProgress(cnttototal);
+                                                        proUser.Maximum = int.Parse(txtCurrentToken.Text);
+                                                        stripLabel.Text = "File " + cnttototal + " of " + totalfiles;
+                                                        double? mathisfun = 1;
+                                                        mathisfun = ((100 * cnttototal) / totalfiles);
+                                                        if (mathisfun <= 0 || mathisfun >= cnttototal)
+                                                            mathisfun = 1;
+                                                        double mathToken = double.Parse(txtPrevToken.Text);
+                                                        mathToken = Math.Round((damn + mathToken));
+                                                        // Bring our token up to date for next run
+                                                        txtPrevToken.Text = mathToken.ToString();
+                                                        //File.WriteAllText(savelocation + ".currenttoken.tok", mathToken.ToString());
+                                                        txtCurrentToken.Text = start.StartPageTokenValue.ToString();
+                                                        if (cnttototal == totalfiles)
+                                                            exfunctions.MoveFiles(savelocation);
                                                         int proval = int.Parse(txtPrevToken.Text);
                                                         int nowval = int.Parse(txtCurrentToken.Text);
                                                         if (proval >= nowval)
                                                             proval = nowval;
                                                         proUser.Value = (proval);
-                                                        lblProgresslbl.Text = ("Current progress: " + Math.Round(double.Parse(mathisfun.ToString())) + "% completed.");
+                                                        lblProgresslbl.Text = ("Current progress: " + mathisfun.ToString() + "% completed.");
                                                         // Our file is a CSV. Column 1 = file ID, Column 2 = File name
                                                         var values = file.Split(',');
                                                         string fileId = values[0];
@@ -336,6 +320,7 @@ namespace TuckerTech_GABackup_GUI
                                                         logFile.WriteLine("ID: " + values[0] + " - Filename: " + values[1]);
                                                         logFile.Flush();
                                                         GC.Collect();
+
                                                         // Things get sloppy here. The reason we're checking MimeTypes
                                                         // is because we have to export the files from Google's format
                                                         // to a format that is readable by a desktop computer program
@@ -379,7 +364,7 @@ namespace TuckerTech_GABackup_GUI
                                                                 ext = ".docx";
                                                                 break;
                                                             case "application/vnd.google-apps.drawing":
-                                                                ext = ".ggl";
+                                                                ext = ".bmp";
                                                                 break;
                                                             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                                                                 ext = ".docx";
@@ -455,7 +440,7 @@ namespace TuckerTech_GABackup_GUI
                                                                 break;
                                                         }
 
-                                                        if (ext.Contains(".doc") || ext.Contains(".xls"))
+                                                        if (ext.Contains(".doc") || ext.Contains(".xls") || ext.Contains(".ppt"))
                                                         {
                                                             string whatami = null;
                                                             if (ext.Contains(".xls"))
@@ -572,21 +557,29 @@ namespace TuckerTech_GABackup_GUI
                                                             stream1.Close();
                                                             stream1.Dispose();
                                                         }
-
                                                     }
                                                     catch (Exception ex)
                                                     {
                                                         Console.Write("\nInfo: ---> " + ex.Message.ToString() + "\n");
                                                     }
-                                                }
-                                                btnStart.Text = "Start Backup!";
-                                                logfile.Flush();
-                                                logFile.Close();
-                                                logFile.Dispose();
+                                                });
                                             }
+                                            exfunctions.MoveFiles(savelocation);
+                                            Console.WriteLine("\n\n\tBackup completed for selected user!");
+                                            txtLog.Text += (Environment.NewLine + "\n\nBackup completed for selected " + user + "\n\n" + Environment.NewLine);
+                                            btnStart.Text = "Start Backup!";
+                                            logfile.Flush();
+                                            logFile.Close();
+                                            logFile.Dispose();
                                         }
                                     }
                                 }
+                                catch (FormatException ex) { errorHandler(ex); }
+                                catch (Google.GoogleApiException ex) { errorHandler(ex); }
+                                catch (AggregateException ex) { errorHandler(ex); }
+                                catch (OverflowException ex) { errorHandler(ex); }
+                                catch (ArgumentNullException ex) { errorHandler(ex); }
+                            }
                             );
                             if (checkforfinished.IsCompleted == true)
                             {
@@ -599,7 +592,6 @@ namespace TuckerTech_GABackup_GUI
                                 Console.WriteLine("Backup for all users was not completed!");
                             }
                             logfile.Close();
-
                         }
                     }
                 }
@@ -609,7 +601,6 @@ namespace TuckerTech_GABackup_GUI
                     {
                         Console.WriteLine("Info: " + ex.Message.ToString());
                     }
-                    throw;
                 }
 
             }
@@ -881,7 +872,7 @@ namespace TuckerTech_GABackup_GUI
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            Preferences pref = new Preferences();
+            chkOverwrite pref = new chkOverwrite();
             pref.Show();
         }
 
@@ -893,8 +884,7 @@ namespace TuckerTech_GABackup_GUI
 
         private void conRestore_Click(object sender, EventArgs e)
         {
-            Action<Exception> errorHandler = (ex) =>
-            {
+            Action<Exception> errorHandler = (ex) => {
                 Console.WriteLine("ERROR: " + ex.Message.ToString());
             };
             try
@@ -1207,7 +1197,7 @@ namespace TuckerTech_GABackup_GUI
 
         private void btnPref_Click(object sender, EventArgs e)
         {
-            Preferences pref = new Preferences();
+            chkOverwrite pref = new chkOverwrite();
             pref.Show();
         }
 
@@ -1223,7 +1213,7 @@ namespace TuckerTech_GABackup_GUI
 
         private void preferencesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Preferences pref = new Preferences();
+            chkOverwrite pref = new chkOverwrite();
             pref.Show();
         }
 
