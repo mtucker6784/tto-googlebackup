@@ -48,7 +48,7 @@ namespace TuckerTech_GABackup_GUI
             {
                 try
                 {
-                    if (x.b[2] == "0")
+                    if (x.b[4] == "1")
                     {
                         Console.Write("Root directory, skipping.\n");
                         return;
@@ -239,26 +239,51 @@ namespace TuckerTech_GABackup_GUI
                                 break;
                         }
                         origfile = Path.Combine(savelocation, x.b[1] + ext);
-                        if (!File.Exists(origfile))
+                        if (!File.Exists(origfile)) // Dec 13 2016: May come back here w/ an overwrite option and change this so that either overwrite the file or rename it to something like filename_randomguid.
                             continue;
                         x.a[1] = x.a[1].Replace('"', '\\');
-                        if (x.b[3] == x.c[4])
+                        if (x.b[3] == x.c[4]) // IF the 4th column of deltatok.tok == the 5th column of .folderlog.log
                         {
-                            destfile = (x.c[1] + "\\" + x.b[1] + ext);
+                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
                             Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
                             File.Move(origfile, destfile);
                             continue;
                         }
-                        else if (x.a[0] == x.b[3])
+                        
+                        else if (x.b[3] == x.a[2]) // IF 4th column of .deltalog.tok is equal to 3rd column of .folderlog.txt ...
                         {
-                            destfile = (x.a[1] + "\\" + x.b[1] + ext);
+                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
                             Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
                             File.Move(origfile, destfile);
                             continue;
+                        }
+
+                        else if (x.b[3] == x.a[2]) // IF 4th column of .deltalog.tok is equal to 3rd column of .folderlog.txt ...
+                        {
+                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
+                            Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
+                            File.Move(origfile, destfile);
+                            continue;
+                        }
+
+                        else if (x.a[4] == x.c[0]) // IF the 5th column of folderlog.txt == the first column of .folderlog.log
+                        {
+                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
+                            Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
+                            File.Move(origfile, destfile);
+                            continue;
+                        }
+                        else
+                        {
+                            // one more last ditch effort... If nothing matches criteria above, assume we know where it's going (not many options left anyway)
+                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
+                            Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
+                            File.Move(origfile, destfile);
                         }
                     }
                     catch (IOException ex)
                     {
+                        // Nothing worked? Ugh..
                         Console.WriteLine("Error: " + ex.Message.ToString() + " Status: Carrying on");
                     }
                 }
@@ -266,12 +291,9 @@ namespace TuckerTech_GABackup_GUI
         }
         public static void RecordFolderList(string savedStartPageToken, string pageToken, string user, string savelocation)
         {
-            
             Console.WriteLine("RECORDFOLDERLIST(): " + savelocation);
             if (File.Exists(savelocation + "folderlog.txt"))
                 File.Delete(savelocation + "folderlog.txt");
-            //Form1 sendtolog = new Form1();
-            //sendtolog.TxtLog = "Recording folders to file...";
             FilesResource.ListRequest request1 = null;
             StreamWriter folderlog = new StreamWriter(savelocation + "folderlog.txt", true);
             StreamWriter logFile = new StreamWriter(savelocation + ".recent.log");
@@ -321,16 +343,12 @@ namespace TuckerTech_GABackup_GUI
                             folderlog.WriteLine(change.Id + "," + dirname + folderid + "," + "0" + "," + "1");
                             folderlog.Flush();
                             Console.WriteLine("Creating directory: " + dirname);
-                            //if (Directory.Exists(dirname))
-                            //    continue;
                             Directory.CreateDirectory(dirname);
                         }
                         else
                         {
-                            folderlog.WriteLine(change.Id + "," + dirname + folderid + "," + "0");
+                            folderlog.WriteLine(change.Id + "," + dirname + folderid + "," + "0" + "," + "0");
                             folderlog.Flush();
-                            //if (Directory.Exists(dirname))
-                            //    continue;
                             Directory.CreateDirectory(dirname);
                         }
                     }
@@ -341,7 +359,6 @@ namespace TuckerTech_GABackup_GUI
                     logFile.Flush();
                     Console.WriteLine("Oops!: " + ex.Message.ToString());
                 }
-
             }
 
             logFile.Close();
@@ -391,10 +408,10 @@ namespace TuckerTech_GABackup_GUI
                             //Form1.proUserclass.Value = x;
                             // Record the changed file
                             // Let's...not backup every file on Earth. Check user options and determine if we want to consume our backup resources to downloading a file that -probably isn't- a normal document (ie: uploaded video/movie)
-                            // Check the bigfiles appsetting. If the file is bigger than 100mb, skip it.
+                            // Check the bigfiles appsetting. If the file is bigger than X (whatever is set), skip it.
                             if (bigfiles != "") // Is there input in the "skip files over X MB" textbox.
                             {
-                                if (filesize >= intbigfiles) // 104857600 == 100MB
+                                if (filesize >= intbigfiles) // For reference: 104857600 bytes == 100MB
                                 {
                                     //
                                 }
@@ -460,15 +477,14 @@ namespace TuckerTech_GABackup_GUI
 
                     }
                     if (changes.NewStartPageToken != null)
-                    {
-                        // Last page, save this token for the next polling interval
+                         // Last page, save this token for the next polling interval
                         savedStartPageToken = changes.NewStartPageToken;
-                    }
                     // Bring our token up to date for next run
                     pageToken = changes.NextPageToken;
                     savedStartPageToken = changes.NextPageToken;
                     //File.WriteAllText(savelocation + ".currenttoken.tok", start.StartPageTokenValue + "," + pageToken);
                     File.WriteAllText(savelocation + ".currenttoken.tok", start.StartPageTokenValue);
+
                 }
                 deltalog.Close();
                 logFile.Close();

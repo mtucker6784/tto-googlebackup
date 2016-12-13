@@ -10,9 +10,9 @@ using System.Windows.Forms;
 using System.Configuration;
 namespace TuckerTech_GABackup_GUI
 {
-    public partial class Preferences : Form
+    public partial class chkOverwrite : Form
     {
-        public Preferences()
+        public chkOverwrite()
         {
             InitializeComponent();
             ConfigurationManager.RefreshSection("appSettings");

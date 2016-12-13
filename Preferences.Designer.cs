@@ -1,6 +1,6 @@
 ﻿namespace TuckerTech_GABackup_GUI
 {
-    partial class Preferences
+    partial class chkOverwrite
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Preferences));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(chkOverwrite));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,6 +54,7 @@
             this.txtSaveLocation = new System.Windows.Forms.TextBox();
             this.tabAdvanced = new MetroFramework.Controls.MetroTabPage();
             this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
+            this.btnClose = new System.Windows.Forms.Button();
             this.txtProcessors = new MetroFramework.Controls.MetroTextBox();
             this.lblMultithread = new MetroFramework.Controls.MetroLabel();
             this.btnSaveMB = new System.Windows.Forms.Button();
@@ -64,9 +65,9 @@
             this.txtMB = new System.Windows.Forms.CheckedListBox();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.tipBiggerThan = new System.Windows.Forms.ToolTip(this.components);
             this.tabSchedule = new MetroFramework.Controls.MetroTabPage();
-            this.btnClose = new System.Windows.Forms.Button();
+            this.tipBiggerThan = new System.Windows.Forms.ToolTip(this.components);
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.metroTabControl1.SuspendLayout();
@@ -97,7 +98,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -332,6 +333,7 @@
             // 
             this.metroPanel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.metroPanel2.CausesValidation = false;
+            this.metroPanel2.Controls.Add(this.checkBox1);
             this.metroPanel2.Controls.Add(this.btnClose);
             this.metroPanel2.Controls.Add(this.txtProcessors);
             this.metroPanel2.Controls.Add(this.lblMultithread);
@@ -349,6 +351,16 @@
             this.metroPanel2.VerticalScrollbarBarColor = true;
             this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
             this.metroPanel2.VerticalScrollbarSize = 10;
+            // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(430, 116);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 18;
+            this.btnClose.Text = "&Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // txtProcessors
             // 
@@ -517,16 +529,6 @@
             this.label1.Text = "Backup the following files (DISABLED .. ALL FILES ALLOWED RIGHT NOW)";
             this.tipBiggerThan.SetToolTip(this.label1, "Currently Disabled. All files will be downloaded.");
             // 
-            // tipBiggerThan
-            // 
-            this.tipBiggerThan.AutomaticDelay = 100;
-            this.tipBiggerThan.AutoPopDelay = 5000;
-            this.tipBiggerThan.InitialDelay = 100;
-            this.tipBiggerThan.IsBalloon = true;
-            this.tipBiggerThan.ReshowDelay = 20;
-            this.tipBiggerThan.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.tipBiggerThan.ToolTipTitle = "Advanced Info";
-            // 
             // tabSchedule
             // 
             this.tabSchedule.HorizontalScrollbarBarColor = true;
@@ -541,17 +543,28 @@
             this.tabSchedule.VerticalScrollbarHighlightOnWheel = false;
             this.tabSchedule.VerticalScrollbarSize = 10;
             // 
-            // btnClose
+            // tipBiggerThan
             // 
-            this.btnClose.Location = new System.Drawing.Point(430, 116);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(75, 23);
-            this.btnClose.TabIndex = 18;
-            this.btnClose.Text = "&Close";
-            this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            this.tipBiggerThan.AutomaticDelay = 100;
+            this.tipBiggerThan.AutoPopDelay = 5000;
+            this.tipBiggerThan.InitialDelay = 100;
+            this.tipBiggerThan.IsBalloon = true;
+            this.tipBiggerThan.ReshowDelay = 20;
+            this.tipBiggerThan.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.tipBiggerThan.ToolTipTitle = "Advanced Info";
             // 
-            // Preferences
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(185, 79);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(130, 17);
+            this.checkBox1.TabIndex = 20;
+            this.checkBox1.Text = "Overwrite existing files";
+            this.tipBiggerThan.SetToolTip(this.checkBox1, resources.GetString("checkBox1.ToolTip"));
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // chkOverwrite
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -561,7 +574,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Preferences";
+            this.Name = "chkOverwrite";
             this.Text = "Preferences";
             this.Activated += new System.EventHandler(this.Preferences_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Preferences_FormClosing);
@@ -623,5 +636,6 @@
         private MetroFramework.Controls.MetroLabel lblMultithread;
         private MetroFramework.Controls.MetroTabPage tabSchedule;
         private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
