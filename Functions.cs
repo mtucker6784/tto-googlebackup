@@ -249,36 +249,17 @@ namespace TuckerTech_GABackup_GUI
                             File.Move(origfile, destfile);
                             continue;
                         }
-                        
-                        else if (x.b[3] == x.a[2]) // IF 4th column of .deltalog.tok is equal to 3rd column of .folderlog.txt ...
+                        else if (x.a[0] == x.b[3])
                         {
-                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
-                            Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
+                            if (ext == null || ext == "")
+                            {
+                                destfile = (x.a[1] + "\\" + x.b[1]);
+                                File.Move(origfile, destfile);
+                                continue;
+                            }
+                            destfile = (x.a[1] + "\\" + x.b[1] + ext);
                             File.Move(origfile, destfile);
                             continue;
-                        }
-
-                        else if (x.b[3] == x.a[2]) // IF 4th column of .deltalog.tok is equal to 3rd column of .folderlog.txt ...
-                        {
-                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
-                            Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
-                            File.Move(origfile, destfile);
-                            continue;
-                        }
-
-                        else if (x.a[4] == x.c[0]) // IF the 5th column of folderlog.txt == the first column of .folderlog.log
-                        {
-                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
-                            Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
-                            File.Move(origfile, destfile);
-                            continue;
-                        }
-                        else
-                        {
-                            // one more last ditch effort... If nothing matches criteria above, assume we know where it's going (not many options left anyway)
-                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
-                            Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
-                            File.Move(origfile, destfile);
                         }
                     }
                     catch (IOException ex)

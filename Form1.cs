@@ -157,6 +157,7 @@ namespace TuckerTech_GABackup_GUI
                                     Console.WriteLine("Selecting user: " + names.ToString());
                                     txtLog.Text += "Selecting user: " + names.ToString() + Environment.NewLine;
                                     logfile.WriteLine("Selecting user: " + names.ToString() + Environment.NewLine);
+                                    scrolltobtm();
                                     txtCurrentUser.Text = names.ToString();
                                     // Define parameters of request.
                                     string user = names.ToString();
@@ -226,6 +227,7 @@ namespace TuckerTech_GABackup_GUI
                                     {
                                         Console.WriteLine("Nothing to save!\n" + Environment.NewLine);
                                         txtLog.Text += ("User has nothing to save!" + Environment.NewLine);
+                                        scrolltobtm();
                                     }
                                     else
                                     {
@@ -233,6 +235,7 @@ namespace TuckerTech_GABackup_GUI
                                         {
                                             Console.WriteLine("No file changes found for " + user + "\n" + Environment.NewLine);
                                             txtLog.Text += ("[" + user + "] No file changes found! Next!" + Environment.NewLine);
+                                            scrolltobtm();
                                             return;
                                         }
                                         else
@@ -246,16 +249,25 @@ namespace TuckerTech_GABackup_GUI
                                             {
                                                 txtLog.Text += Environment.NewLine + "[" + user + "] Recording folder list ..." + Environment.NewLine;
                                                 logfile.WriteLine(user + " --- Recording folder list..." + Environment.NewLine);
+                                                scrolltobtm();
                                                 exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
+                                                scrolltobtm();
                                                 txtLog.Text += Environment.NewLine + "Recording new/changed list for: " + user + Environment.NewLine;
+                                                scrolltobtm();
                                                 exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
+                                                scrolltobtm();
                                             }
                                             else
                                             {
+                                                scrolltobtm();
                                                 txtLog.Text += Environment.NewLine + "[" + user + "] Recording folder list ..." + Environment.NewLine;
+                                                scrolltobtm();
                                                 exfunctions.RecordFolderList(savedStartPageToken, pageToken, user, savelocation);
+                                                scrolltobtm();
                                                 txtLog.Text += Environment.NewLine + "[" + user + "] Recording new/changed files ..." + Environment.NewLine;
+                                                scrolltobtm();
                                                 exfunctions.ChangesFileList(savedStartPageToken, pageToken, user, savelocation);
+                                                scrolltobtm();
                                             }
 
                                             // Get all our files for the user. Max page size is 1k
@@ -278,10 +290,11 @@ namespace TuckerTech_GABackup_GUI
                                                 if (damn <= 0)
                                                     damn = 1;
                                                 //foreach (var file in deltafiles)
-                                                Parallel.ForEach(deltafiles, opts, (file) =>
+                                                Parallel.ForEach(deltafiles, (file) =>
                                                 {
                                                     try
                                                     {
+                                                        scrolltobtm();
                                                         txtCurrentUser.Text = user;
                                                         DateTime dt = DateTime.Now;
                                                         string[] foldervalues = File.ReadAllLines(savelocation + "folderlog.txt");
