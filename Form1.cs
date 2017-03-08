@@ -212,7 +212,7 @@ namespace TuckerTech_GABackup_GUI
                                         // Token record didn't exist. Create a generic file, start at "1st" token
                                         // In reality, I have no idea what token to start at, but 1 seems to be safe.
                                         Console.Write("Creating new token file.\n");
-                                        //txtLog.Text += ("Creating new token file.\n" + Environment.NewLine);
+                                        txtLog.Text += ("Creating new token file.\n" + Environment.NewLine);
                                         StreamWriter sw = new StreamWriter(savelocation + ".currenttoken.tok");
                                         sw.Write(1);
                                         sw.Dispose();
@@ -290,7 +290,7 @@ namespace TuckerTech_GABackup_GUI
                                                 if (damn <= 0)
                                                     damn = 1;
                                                 //foreach (var file in deltafiles)
-                                                Parallel.ForEach(deltafiles, (file) =>
+                                                Parallel.ForEach(deltafiles, opts, (file) =>
                                                 {
                                                     try
                                                     {
@@ -571,7 +571,7 @@ namespace TuckerTech_GABackup_GUI
                                                             stream1.Dispose();
                                                         }
                                                     }
-                                                    catch (Exception ex)
+                                                    catch (AggregateException ex)
                                                     {
                                                         Console.Write("\nInfo: ---> " + ex.Message.ToString() + "\n");
                                                     }
@@ -594,10 +594,11 @@ namespace TuckerTech_GABackup_GUI
                                 catch (ArgumentNullException ex) { errorHandler(ex); }
                             }
                             );
-                            if (checkforfinished.IsCompleted == true)
+                            if (checkforfinished.IsCompleted == true && checkforfinished.LowestBreakIteration.HasValue)
                             {
-                                MessageBox.Show("Backup for all users is complete!");
-                                Console.WriteLine("Backup for all users is complete!");
+                                MessageBox.Show("ForEach backup was stopped prematurely", "ForEach loop error",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                Console.WriteLine("ForEach backup was stopped prematurely");
+                                Debug.WriteLine("ForEach backup was stopped prematurely");
                             }
                             else
                             {
