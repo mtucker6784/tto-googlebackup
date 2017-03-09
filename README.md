@@ -1,7 +1,7 @@
-[![Stories in Ready](https://badge.waffle.io/mtuckerinaz/tt-gdb.png?label=ready&title=Ready)](https://waffle.io/mtuckerinaz/tt-gdb)
+[![Stories in Ready](https://badge.waffle.io/mtucker6784/tto-googlebackup?label=ready&title=Ready)](https://waffle.io/mtucker6784/tto-googlebackup/)
 # Tucker Tech's Google Apps Drive Backup (TT-GDB)
 
-[![Join the chat at https://gitter.im/mtuckerinaz/tt-gdb](https://badges.gitter.im/mtuckerinaz/tt-gdb.svg)](https://gitter.im/mtuckerinaz/tt-gdb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/mtucker6784/tto-googlebackup](https://badges.gitter.im/mtucker6784/tto-googlebackup.svg)](https://gitter.im/mtucker6784/tto-googlebackup?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Tucker Tech's Free Google Apps Drive backup utility (TT-GDB) --- C# Drive API v3
 
 Backup tool for backing up Google Apps Drive environments. This uses the Drive API v3 and C# (.net 4.5)
@@ -25,13 +25,13 @@ Known issue(s) / concerns / future plans:
 1. Create master log file for overall status. A log file is currently written for each user and streamed to their root drive directory.
 2. Add backup/restore for user Gmail boxes.
 
-Hope this helps others who are looking for a similar solution!
+Changes:
 
-The Syncfusion.com Winform controls are now necessary to compile this solution. the controls are free for those who want to create an account and develop "free" software. 
+December 2016 --- Began adding in Gmail logic but is commented out until I expand the code out further.
 
 If you download the solution and plan to compile it, make sure to download the NuGet repository for the Google Apps Drive (v3) tools. This can be done by opening the NuGet manager in VS and typing in: "Install-Package Google.Apis.Drive.v3" (Without quotes). There may be another step or two I'm forgetting, but feel free to ask and I'll be glad to help.
 
-Binary download is on the releases page (https://github.com/mtuckerinaz/Gapps-backup/releases)
-See http://www.tuckertechonline.com/ for instructions + screenshots
+Binary download is on the releases page (https://github.com/mtucker6784/tto-googlebackup/releases)
+See http://ttobackup.readme.io for instructions + screenshots
 
-Please understand that I know the code is very elementary, but it's enough to get the ball rolling.
+Please understand that I know the code is very elementary, I would love to have jolly co-operation on this project! Feel free to fork and do some PRs :-)
