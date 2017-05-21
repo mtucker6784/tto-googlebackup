@@ -21,7 +21,6 @@ namespace TuckerTech_GABackup_GUI
 
         private void Preferences_Load(object sender, EventArgs e)
         {
-            ConfigurationManager.RefreshSection("appSettings");
             Properties.Settings.Default.Reload();
             txtDomainKey.Text = ConfigurationManager.AppSettings["domainkey"];
             txtEmail.Text = ConfigurationManager.AppSettings["serviceemail"];
@@ -30,6 +29,8 @@ namespace TuckerTech_GABackup_GUI
             txtReplaceDomain.Text = ConfigurationManager.AppSettings["replacedomain"];
             txtBiggerThan.Text = ConfigurationManager.AppSettings["bigfiles"];
             txtProcessors.Text = ConfigurationManager.AppSettings["multithread"];
+            ConfigurationManager.RefreshSection("bigfiles");
+            ConfigurationManager.RefreshSection("multithread");
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -49,7 +50,12 @@ namespace TuckerTech_GABackup_GUI
                 saveconfig.AppSettings.Settings.Add("defaultdomain", txtDefaultDomain.Text);
                 saveconfig.AppSettings.Settings.Add("replacedomain", txtReplaceDomain.Text);
                 saveconfig.Save(ConfigurationSaveMode.Modified,true);
-                ConfigurationManager.RefreshSection("appSettings");
+                ConfigurationManager.RefreshSection("domainkey");
+                ConfigurationManager.RefreshSection("serviceemail");
+                ConfigurationManager.RefreshSection("savelocation");
+                ConfigurationManager.RefreshSection("defaultdomain");
+                ConfigurationManager.RefreshSection("replacedomain");
+
                 stripLabel.Text = "Successfully saved settings! Please restart this program.";
             }
             catch(Exception ex)
@@ -108,7 +114,8 @@ namespace TuckerTech_GABackup_GUI
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ConfigurationManager.RefreshSection("appSettings");
+            ConfigurationManager.RefreshSection("bigfiles");
+            ConfigurationManager.RefreshSection("multithread");
             this.Close();
         }
 
@@ -129,7 +136,8 @@ namespace TuckerTech_GABackup_GUI
                 saveconfig.AppSettings.Settings.Add("bigfiles", txtBiggerThan.Text);
                 saveconfig.AppSettings.Settings.Add("multithread", txtProcessors.Text);
                 saveconfig.Save(ConfigurationSaveMode.Modified, true);
-                ConfigurationManager.RefreshSection("appSettings");
+                ConfigurationManager.RefreshSection("bigfiles");
+                ConfigurationManager.RefreshSection("multithread");
                 stripLabel.Text = "Successfully saved settings!";
 
             }
@@ -141,17 +149,20 @@ namespace TuckerTech_GABackup_GUI
 
         private void Preferences_FormClosed(object sender, FormClosedEventArgs e)
         {
-            ConfigurationManager.RefreshSection("appSettings");
+            ConfigurationManager.RefreshSection("bigfiles");
+            ConfigurationManager.RefreshSection("multithread");
         }
 
         private void Preferences_FormClosing(object sender, FormClosingEventArgs e)
         {
-            ConfigurationManager.RefreshSection("appSettings");
+            ConfigurationManager.RefreshSection("bigfiles");
+            ConfigurationManager.RefreshSection("multithread");
         }
 
         private void Preferences_Activated(object sender, EventArgs e)
         {
-            ConfigurationManager.RefreshSection("appSettings");
+            ConfigurationManager.RefreshSection("bigfiles");
+            ConfigurationManager.RefreshSection("multithread");
         }
 
         private void btnCancel_Click(object sender, MouseEventArgs e)

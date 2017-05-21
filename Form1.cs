@@ -9,6 +9,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Gmail.v1;
 using System;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
@@ -130,19 +131,20 @@ namespace TuckerTech_GABackup_GUI
                         }
                         else
                         {
-                            int totalresource = int.Parse(ConfigurationManager.AppSettings["multithread"]);
                             var opts = new ParallelOptions { MaxDegreeOfParallelism = 1 };
                             if (Environment.Is64BitOperatingSystem == true) // x64, let's use all our set preference instead.
                             {
-                                opts = new ParallelOptions { MaxDegreeOfParallelism = totalresource };
+                                opts = new ParallelOptions { MaxDegreeOfParallelism = int.Parse(ConfigurationManager.AppSettings["multithread"]) };
                             }
                             int arraycount = 0;
                             var curIndex = 0;
                             int usercount = lstBackupUsers.Items.Count;
                             string curdate = DateTime.Now.Month.ToString() + "-" + DateTime.Now.Day.ToString() + "-" + DateTime.Now.Hour.ToString() + "." + DateTime.Now.Minute.ToString() + "." + DateTime.Now.Second.ToString();
                             StreamWriter logfile = new StreamWriter(Environment.CurrentDirectory + "\\Logs\\MasterLogFile_" + curdate + ".log", true);
-
-                            var checkforfinished = Parallel.ForEach(lstBackupUsers.Items.Cast<ListViewItem>(), opts, name =>
+                            OrderablePartitioner<ListViewItem> partitioner = Partitioner.Create(lstBackupUsers.Items.Cast<ListViewItem>(), EnumerablePartitionerOptions.NoBuffering);
+                            object LockObject = new object();
+                            var checkforfinished = Parallel.ForEach(partitioner, opts, name =>
+                            //var checkforfinished = Parallel.ForEach(lstBackupUsers.Items.Cast<ListViewItem>(), opts, name =>
                             {
                                 try
                                 {
@@ -152,6 +154,7 @@ namespace TuckerTech_GABackup_GUI
                                         return;
                                     lstBackupUsers.Items[name.Index].Selected = true;
                                     lstBackupUsers.Items[name.Index].BackColor = Color.CornflowerBlue;
+                                    lstBackupUsers.Items[name.Index].Checked = true;
                                     curIndex = Interlocked.Increment(ref arraycount);
                                     stripLabel.Text = "";
                                     Console.WriteLine("Selecting user: " + names.ToString());
@@ -289,7 +292,6 @@ namespace TuckerTech_GABackup_GUI
                                                 damn = Math.Round((damn / totalfiles));
                                                 if (damn <= 0)
                                                     damn = 1;
-                                                //foreach (var file in deltafiles)
                                                 Parallel.ForEach(deltafiles, opts, (file) =>
                                                 {
                                                     try
@@ -592,8 +594,7 @@ namespace TuckerTech_GABackup_GUI
                                 catch (AggregateException ex) { errorHandler(ex); }
                                 catch (OverflowException ex) { errorHandler(ex); }
                                 catch (ArgumentNullException ex) { errorHandler(ex); }
-                            }
-                            );
+                            });
                             if (checkforfinished.IsCompleted == true && checkforfinished.LowestBreakIteration.HasValue)
                             {
                                 MessageBox.Show("ForEach backup was stopped prematurely", "ForEach loop error",MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -602,12 +603,13 @@ namespace TuckerTech_GABackup_GUI
                             }
                             else
                             {
-                                MessageBox.Show("Backup for all users was not completed!");
-                                Console.WriteLine("Backup for all users was not completed!");
+                                MessageBox.Show("Backup for all users was completed!");
+                                Console.WriteLine("Backup for all users was completed!");
                             }
                             logfile.Close();
                         }
                     }
+                    
                 }
                 catch (Exception ex)
                 {
@@ -1189,6 +1191,7 @@ namespace TuckerTech_GABackup_GUI
                                     lstBackupUsers.Items.Add(myuser);
                                 }
                             }
+                            lblFile.Text = ("Found: "+lstBackupUsers.Items.Count.ToString()+" total users to backup.");
                         }
                     }
                 }
