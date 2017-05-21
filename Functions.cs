@@ -25,8 +25,11 @@ namespace TuckerTech_GABackup_GUI
         {
             
         }
+
+
         public static void CreateSubDir(string savelocation)
         {
+            
             Console.WriteLine("CREATING SUBDIR: " + savelocation);
             string directoryname = (savelocation + "folderlog.txt"); // Folder log created by the folder record f(x)
             string filename = (savelocation + ".deltalog.tok"); // The changed file list generated from changed files f(x)
@@ -89,187 +92,186 @@ namespace TuckerTech_GABackup_GUI
 
         public static void MoveFiles(string savelocation)
         {
-            string directoryname = (savelocation + "folderlog.txt");    // Folder log created by the folder record f(x)
-            string filename = (savelocation + ".deltalog.tok");         // The changed file list generated from changed files f(x)
-            string filedirectory = (savelocation + ".folderlog.log");   // This is the new log file that will be created once the sub dirs are relocated.
-            string ext = null;
-            string destfile = null;
-            string origfile = null;
-
-            var filedir = File.ReadLines(directoryname)
-                        .Select(line => line.Split(','))
-                        .Where(item => item.All(part => !string.IsNullOrWhiteSpace(part)))
-                        .ToList();
-
-            var filelines = File.ReadLines(filename)
-                        .Select(line => line.Split(','))
-                        .Where(item => item.All(part => !string.IsNullOrWhiteSpace(part)))
-                        .ToList();
-
-            var fulldirpath = File.ReadLines(filedirectory)
-                    .Select(line => line.Split(','))
-                    .Where(item => item.All(part => !string.IsNullOrWhiteSpace(part)))
-                    .ToList();
-
-            var movefile = from a in filedir.AsParallel()    // folderlog.txt (created by folder record earlier)
-                           from b in filelines.AsParallel()  // New / changed file .deltalog.tok file.
-                           from c in fulldirpath.AsParallel()
-                           where a[0] == b[3] && b[3] != null || b[3] != "" && c[0] != a[1] // where folderlog.txt's folderID is equal to deltalog.tok's folder ID
-                           select new { a, b, c };
-
-            // Move files to the correct folders
-            Console.WriteLine("Time to move files");
-            if (!movefile.Any())
-                Console.Write("No files to move to directories. Linq query is empty!");
-            if (movefile.Any())
+            try
             {
-                foreach (var x in movefile)
+                string directoryname = (savelocation + "folderlog.txt");    // Folder log created by the folder record f(x)
+                string filename = (savelocation + ".deltalog.tok");         // The changed file list generated from changed files f(x)
+                string filedirectory = (savelocation + ".folderlog.log");   // This is the new log file that will be created once the sub dirs are relocated.
+                string ext = null;
+                string destfile = null;
+                string origfile = null;
+                if (!Directory.Exists(savelocation + "TTO_Backup"))
+                    Directory.CreateDirectory(savelocation + "TTO_Backup");
+                var filedir = File.ReadLines(directoryname)
+                            .Select(line => line.Split(','))
+                            .Where(item => item.All(part => !string.IsNullOrWhiteSpace(part)))
+                            .ToList();
+
+                var filelines = File.ReadLines(filename)
+                            .Select(line => line.Split(','))
+                            .Where(item => item.All(part => !string.IsNullOrWhiteSpace(part)))
+                            .ToList();
+
+                var fulldirpath = File.ReadLines(filedirectory)
+                        .Select(line => line.Split(','))
+                        .Where(item => item.All(part => !string.IsNullOrWhiteSpace(part)))
+                        .ToList();
+
+                var movefile = from a in filedir.AsParallel()    // folderlog.txt (created by folder record earlier)
+                               from b in filelines.AsParallel()  // New / changed file .deltalog.tok file.
+                               from c in fulldirpath.AsParallel()
+                               where a[0] == b[3] && b[3] != null || b[3] != "" && c[0] != a[1] // where folderlog.txt's folderID is equal to deltalog.tok's folder ID
+                               select new { a, b, c };
+
+                // Move files to the correct folders
+                Console.WriteLine("Time to move files");
+                if (!movefile.Any())
+                    Console.Write("No files to move to directories. Linq query is empty!");
+                if (movefile.Any())
                 {
-                    try
+                    foreach (var x in movefile)
                     {
-                        switch (x.b[2])
+                        try
                         {
-                            case "application/pdf":
-                                ext = ".pdf";
-                                break;
-                            case "application/vnd.google-apps.document":
-                                ext = ".docx";
-                                break;
-                            case "audio/wav":
-                                ext = ".wav";
-                                break;
-                            case "application/vnd.google-apps.spreadsheet":
-                                ext = ".xlsx";
-                                break;
-                            case "application/vnd.google-apps.ritz":
-                                ext = ".xlsx";
-                                break;
-                            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                                ext = ".xlsx";
-                                break;
-                            case "application/vnd.google-apps.kix":
-                                ext = ".docx";
-                                break;
-                            case "application/msword":
-                                ext = ".docx";
-                                break;
-                            case "application/vnd.google-apps.presentation":
-                                ext = ".pptx";
-                                break;
-                            case "application/vnd.google-apps.punch":
-                                ext = ".pptx";
-                                break;
-                            case "application/vnd.google-apps.form":
-                                ext = ".docx";
-                                break;
-                            case "application/vnd.google-apps.freebird":
-                                ext = ".docx";
-                                break;
-                            case "application/vnd.google-apps.drawing":
-                                ext = ".ggl";
-                                break;
-                            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                                ext = ".docx";
-                                break;
-                            case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-                                ext = ".pptx";
-                                break;
-                            case "application/vnd.google-apps.drive-sdk":
-                                ext = ".ggl";
-                                break;
-                            case "image/gif":
-                                ext = ".gif";
-                                break;
-                            case "application/vnd.google.drive.ext-type.jpg":
-                                ext = ".jpg";
-                                break;
-                            case "image/jpeg":
-                                ext = ".jpg";
-                                break;
-                            case "application/vnd.google.drive.ext-type.png":
-                                ext = ".png";
-                                break;
-                            case "image/png":
-                                ext = ".png";
-                                break;
-                            case "application/vnd.google.drive.ext-type.gif":
-                                ext = ".gif";
-                                break;
-                            case "text/plain":
-                                ext = ".txt";
-                                break;
-                            case "application/vnd.google-apps.audio":
-                                ext = ".mp3";
-                                break;
-                            case "application/vnd.google-apps.file":
-                                ext = ".docx";
-                                break;
-                            case "application/vnd.google-apps.photo":
-                                ext = ".jpg";
-                                break;
-                            case "application/vnd.google-apps.video":
-                                ext = ".mp4";
-                                break;
-                            case "application/vnd.google-apps.script+json":
-                                ext = ".json";
-                                break;
-                            case "text/html":
-                                ext = ".html";
-                                break;
-                            case "application/rtf":
-                                ext = ".rtf";
-                                break;
-                            case "application/vnd.oasis.opendocument.text":
-                                ext = ".docx";
-                                break;
-                            case "text/csv":
-                                ext = ".csv";
-                                break;
-                            case "application/vnd.google-apps.unknown":
-                                ext = ".ggl";
-                                break;
-                            case "application/vnd.google-apps.drive-sdk.758379822725":
-                                ext = ".ggl";
-                                break;
-                            case "application/vnd.google-apps.map":
-                                ext = ".gglmap";
-                                break;
-                            default:
-                                ext = ".ggl";
-                                break;
-                        }
-                        origfile = Path.Combine(savelocation, x.b[1] + ext);
-                        if (!File.Exists(origfile)) // Dec 13 2016: May come back here w/ an overwrite option and change this so that either overwrite the file or rename it to something like filename_randomguid.
-                            continue;
-                        x.a[1] = x.a[1].Replace('"', '\\');
-                        if (x.b[3] == x.c[4]) // IF the 4th column of deltatok.tok == the 5th column of .folderlog.log
-                        {
-                            destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
-                            Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
-                            File.Move(origfile, destfile);
-                            continue;
-                        }
-                        else if (x.a[0] == x.b[3])
-                        {
-                            if (ext == null || ext == "")
+                            switch (x.b[2])
                             {
-                                destfile = (x.a[1] + "\\" + x.b[1]);
+                                case "application/pdf":
+                                    ext = ".pdf";
+                                    break;
+                                case "application/vnd.google-apps.document":
+                                    ext = ".docx";
+                                    break;
+                                case "audio/wav":
+                                    ext = ".wav";
+                                    break;
+                                case "application/vnd.google-apps.spreadsheet":
+                                    ext = ".xlsx";
+                                    break;
+                                case "application/vnd.google-apps.ritz":
+                                    ext = ".xlsx";
+                                    break;
+                                case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                                    ext = ".xlsx";
+                                    break;
+                                case "application/vnd.google-apps.kix":
+                                    ext = ".docx";
+                                    break;
+                                case "application/msword":
+                                    ext = ".docx";
+                                    break;
+                                case "application/vnd.google-apps.presentation":
+                                    ext = ".pptx";
+                                    break;
+                                case "application/vnd.google-apps.punch":
+                                    ext = ".pptx";
+                                    break;
+                                case "application/vnd.google-apps.form":
+                                    ext = ".docx";
+                                    break;
+                                case "application/vnd.google-apps.freebird":
+                                    ext = ".docx";
+                                    break;
+                                case "application/vnd.google-apps.drawing":
+                                    ext = ".ggl";
+                                    break;
+                                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                                    ext = ".docx";
+                                    break;
+                                case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                                    ext = ".pptx";
+                                    break;
+                                case "application/vnd.google-apps.drive-sdk":
+                                    ext = ".ggl";
+                                    break;
+                                case "image/gif":
+                                    ext = ".gif";
+                                    break;
+                                case "application/vnd.google.drive.ext-type.jpg":
+                                    ext = ".jpg";
+                                    break;
+                                case "image/jpeg":
+                                    ext = ".jpg";
+                                    break;
+                                case "application/vnd.google.drive.ext-type.png":
+                                    ext = ".png";
+                                    break;
+                                case "image/png":
+                                    ext = ".png";
+                                    break;
+                                case "application/vnd.google.drive.ext-type.gif":
+                                    ext = ".gif";
+                                    break;
+                                case "text/plain":
+                                    ext = ".txt";
+                                    break;
+                                case "application/vnd.google-apps.audio":
+                                    ext = ".mp3";
+                                    break;
+                                case "application/vnd.google-apps.file":
+                                    ext = ".docx";
+                                    break;
+                                case "application/vnd.google-apps.photo":
+                                    ext = ".jpg";
+                                    break;
+                                case "application/vnd.google-apps.video":
+                                    ext = ".mp4";
+                                    break;
+                                case "application/vnd.google-apps.script+json":
+                                    ext = ".json";
+                                    break;
+                                case "text/html":
+                                    ext = ".html";
+                                    break;
+                                case "application/rtf":
+                                    ext = ".rtf";
+                                    break;
+                                case "application/vnd.oasis.opendocument.text":
+                                    ext = ".docx";
+                                    break;
+                                case "text/csv":
+                                    ext = ".csv";
+                                    break;
+                                case "application/vnd.google-apps.unknown":
+                                    ext = ".ggl";
+                                    break;
+                                case "application/vnd.google-apps.drive-sdk.758379822725":
+                                    ext = ".ggl";
+                                    break;
+                                case "application/vnd.google-apps.map":
+                                    ext = ".gglmap";
+                                    break;
+                                default:
+                                    ext = ".ggl";
+                                    break;
+                            }
+                            origfile = Path.Combine(savelocation, x.b[1] + ext);
+                            if (!File.Exists(origfile)) // Dec 13 2016: May come back here w/ an overwrite option and change this so that either overwrite the file or rename it to something like filename_randomguid.
+                                continue;
+                            x.a[1] = x.a[1].Replace('"', '\\');
+                            if (x.b[3] == x.c[4]) // IF the 4th column of deltatok.tok == the 5th column of .folderlog.log
+                            {
+                                destfile = (x.c[1] + "\\" + x.b[1] + ext); // x.c[1] == full directory path in .folderlog.log + filename in deltalog.tok + ext of file
+                                Console.WriteLine("Moving file: " + origfile + " To: " + destfile);
                                 File.Move(origfile, destfile);
                                 continue;
                             }
-                            destfile = (x.a[1] + "\\" + x.b[1] + ext);
-                            File.Move(origfile, destfile);
-                            continue;
                         }
-                    }
-                    catch (IOException ex)
-                    {
-                        // Nothing worked? Ugh..
-                        Console.WriteLine("Error: " + ex.Message.ToString() + " Status: Carrying on");
+                        catch (IOException ex)
+                        {
+                            // Nothing worked? Ugh..
+                            destfile = (savelocation + "TTO_Backup\\" + x.b[1] + ext);
+                            File.Move(origfile, destfile);
+                            Console.WriteLine("Error: " + ex.Message.ToString() + " Status: Carrying on");
+                        }
                     }
                 }
             }
+            catch (Exception ex1)
+            {
+                Console.WriteLine("Error: " + ex1.Message.ToString() + Environment.NewLine + "Source: " + ex1.Source);
+            }
         }
+
         public static void RecordFolderList(string savedStartPageToken, string pageToken, string user, string savelocation)
         {
             Console.WriteLine("RECORDFOLDERLIST(): " + savelocation);
@@ -282,6 +284,7 @@ namespace TuckerTech_GABackup_GUI
             request1 = CreateService.BuildService(user).Files.List();
             request1.Q = @"mimeType='application/vnd.google-apps.folder'";
             request1.Fields = "files";
+            
             request1.Spaces = "drive";
             request1.PageSize = 500;
             var changes = request1.Execute();
@@ -289,23 +292,22 @@ namespace TuckerTech_GABackup_GUI
             {
                 try
                 {
+                    var subfolderreq = CreateService.BuildService(user).Files.Get(change.Id);
+                    subfolderreq.Fields = "id,name,parents";
+                    var sendreq = subfolderreq.Execute();
+                    List<string> subfolder = new List<string>();
+                    subfolder.Add(sendreq.Name);
                     string folderid = "";
                     string updatedfile = change.Name;
                     string mimetype = change.MimeType;
                     if (change.Parents != null)
                     {
-                        var subfolderreq = CreateService.BuildService(user).Files.Get(change.Id);
-                        subfolderreq.Fields = "id,name,parents";
-                        var sendreq = subfolderreq.Execute();
-                        List<string> subfolder = new List<string>();
-                        subfolder.Add(sendreq.Name);
                         foreach (string sub in subfolder)
                         {
                             folderid = String.Join(",", change.Parents);
                             folderid = ("," + folderid + "," + sub.ToString());
                             string subreplace = sub.Replace(":", "_");
-                            //if (Directory.Exists(savelocation + subreplace.ToString()))
-                            //    continue;
+                            subreplace = string.Join("_", subreplace.Split(Path.GetInvalidFileNameChars()));
                             Console.WriteLine("Creating directory: " + savelocation+subreplace.ToString());
                             updatedfile = subreplace.ToString();
                             Directory.CreateDirectory(savelocation+subreplace.ToString());
@@ -334,7 +336,7 @@ namespace TuckerTech_GABackup_GUI
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (AggregateException ex)
                 {
                     logFile.WriteLine(ex.Message.ToString());
                     logFile.Flush();
@@ -489,5 +491,6 @@ namespace TuckerTech_GABackup_GUI
             this.PerformLayout();
         }
     }
+
 
 }

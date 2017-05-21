@@ -54,6 +54,7 @@
             this.txtSaveLocation = new System.Windows.Forms.TextBox();
             this.tabAdvanced = new MetroFramework.Controls.MetroTabPage();
             this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.btnClose = new System.Windows.Forms.Button();
             this.txtProcessors = new MetroFramework.Controls.MetroTextBox();
             this.lblMultithread = new MetroFramework.Controls.MetroLabel();
@@ -67,7 +68,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tabSchedule = new MetroFramework.Controls.MetroTabPage();
             this.tipBiggerThan = new System.Windows.Forms.ToolTip(this.components);
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.metroTabControl1.SuspendLayout();
@@ -352,9 +352,21 @@
             this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
             this.metroPanel2.VerticalScrollbarSize = 10;
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.BackColor = System.Drawing.Color.Transparent;
+            this.checkBox1.Location = new System.Drawing.Point(185, 79);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(130, 17);
+            this.checkBox1.TabIndex = 20;
+            this.checkBox1.Text = "Overwrite existing files";
+            this.tipBiggerThan.SetToolTip(this.checkBox1, resources.GetString("checkBox1.ToolTip"));
+            this.checkBox1.UseVisualStyleBackColor = false;
+            // 
             // btnClose
             // 
-            this.btnClose.Location = new System.Drawing.Point(430, 116);
+            this.btnClose.Location = new System.Drawing.Point(265, 116);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 18;
@@ -408,7 +420,7 @@
             // 
             // btnSaveMB
             // 
-            this.btnSaveMB.Location = new System.Drawing.Point(217, 116);
+            this.btnSaveMB.Location = new System.Drawing.Point(185, 116);
             this.btnSaveMB.Name = "btnSaveMB";
             this.btnSaveMB.Size = new System.Drawing.Size(75, 23);
             this.btnSaveMB.TabIndex = 15;
@@ -552,17 +564,6 @@
             this.tipBiggerThan.ReshowDelay = 20;
             this.tipBiggerThan.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.tipBiggerThan.ToolTipTitle = "Advanced Info";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(185, 79);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(130, 17);
-            this.checkBox1.TabIndex = 20;
-            this.checkBox1.Text = "Overwrite existing files";
-            this.tipBiggerThan.SetToolTip(this.checkBox1, resources.GetString("checkBox1.ToolTip"));
-            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // chkOverwrite
             // 

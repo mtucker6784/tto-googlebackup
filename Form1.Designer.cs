@@ -370,7 +370,7 @@
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(615, 302);
+            this.txtLog.Size = new System.Drawing.Size(615, 296);
             this.txtLog.TabIndex = 57;
             // 
             // panel1
@@ -486,6 +486,7 @@
             // 
             // lstBackupUsers
             // 
+            this.lstBackupUsers.CheckBoxes = true;
             this.lstBackupUsers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colUsers});
             this.lstBackupUsers.Dock = System.Windows.Forms.DockStyle.Left;

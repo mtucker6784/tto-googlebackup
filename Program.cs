@@ -20,7 +20,7 @@ namespace TuckerTech_GABackup_GUI
                 //Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new Form1());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message.ToString());
             }
